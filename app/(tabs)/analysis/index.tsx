@@ -18,12 +18,9 @@ import { ChartBars } from '@/components/ui/ChartBars';
 import { Legend } from '@/components/ui/Legend';
 import { CfoEntryCard } from '@/components/cards/CfoEntryCard';
 import { toJPY } from '@/lib/fx';
-import {
-  incomeData,
-  expenseData,
-  actualChartData,
-  forecastChartData,
-} from '@/constants/mockData';
+import { actualChartData, forecastChartData } from '@/constants/mockData';
+import { useIncome } from '@/hooks/useIncome';
+import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -33,13 +30,16 @@ export default function AnalysisScreen() {
   const { cfoProfile } = useAuth();
   const [chartExpanded, setChartExpanded] = useState(false);
 
+  const { data: incomeData } = useIncome();
+  const { data: expenseData } = useExpenses();
+
   const totalIncome = useMemo(
     () =>
       incomeData.reduce(
         (sum, item) => sum + toJPY(item.amount, item.currency),
         0,
       ),
-    [],
+    [incomeData],
   );
 
   const totalExpense = useMemo(
@@ -48,7 +48,7 @@ export default function AnalysisScreen() {
         (sum, item) => sum + toJPY(Math.abs(item.amount), item.currency),
         0,
       ),
-    [],
+    [expenseData],
   );
 
   const netCF = totalIncome - totalExpense;

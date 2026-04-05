@@ -16,7 +16,8 @@ import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { FAB } from '@/components/ui/FAB';
 import { toJPY, getRate } from '@/lib/fx';
-import { incomeData, expenseData } from '@/constants/mockData';
+import { useIncome } from '@/hooks/useIncome';
+import { useExpenses } from '@/hooks/useExpenses';
 
 const FILTER_KEYS: [string, string][] = [
   ['all', 'すべて'],
@@ -31,22 +32,25 @@ export default function IncomeListScreen() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
+  const { data: incomeData } = useIncome();
+  const { data: expenseData } = useExpenses();
+
   const hasUSD = incomeData.some((i) => i.currency === 'USD');
 
   const totalIncome = useMemo(
     () => incomeData.reduce((sum, i) => sum + toJPY(i.amount, i.currency, i.date), 0),
-    [],
+    [incomeData],
   );
   const totalExpense = useMemo(
     () => expenseData.reduce((sum, e) => sum + toJPY(e.amount, e.currency, e.date), 0),
-    [],
+    [expenseData],
   );
   const net = totalIncome - totalExpense;
 
   const filtered = useMemo(() => {
     if (activeFilter === 'all') return incomeData;
     return incomeData.filter((i) => i.tag === activeFilter);
-  }, [activeFilter]);
+  }, [activeFilter, incomeData]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>

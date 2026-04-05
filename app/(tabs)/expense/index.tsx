@@ -19,13 +19,11 @@ import { FAB } from '@/components/ui/FAB';
 import { CreditCardVisual } from '@/components/cards/CreditCardVisual';
 import { toJPY, getRate } from '@/lib/fx';
 import { calcMonthly, calcTotal } from '@/lib/loan';
-import {
-  expenseData,
-  subscriptionsData,
-  creditCardsData,
-  scheduledExpensesData,
-  loansData,
-} from '@/constants/mockData';
+import { useExpenses } from '@/hooks/useExpenses';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useSubscriptions } from '@/hooks/useSubscriptions';
+import { useScheduledExpenses } from '@/hooks/useScheduledExpenses';
+import { useLoans } from '@/hooks/useLoans';
 
 const SEGMENTS: [string, string][] = [
   ['list', '一覧'],
@@ -43,6 +41,12 @@ export default function ExpenseTabScreen() {
   const [segment, setSegment] = useState('list');
   const [expenseFilter, setExpenseFilter] = useState<string>('すべて');
 
+  const { data: expenseData } = useExpenses();
+  const { data: creditCardsData } = useCreditCards();
+  const { data: subscriptionsData } = useSubscriptions();
+  const { data: scheduledExpensesData } = useScheduledExpenses();
+  const { data: loansData } = useLoans();
+
   // Totals
   const totalExpense = useMemo(
     () =>
@@ -50,7 +54,7 @@ export default function ExpenseTabScreen() {
         (sum, e) => sum + toJPY(e.amount, e.currency, e.date),
         0,
       ),
-    [],
+    [expenseData],
   );
 
   const diff = totalExpense - LAST_MONTH_TOTAL;
@@ -60,7 +64,7 @@ export default function ExpenseTabScreen() {
   // Recurring totals
   const subsTotal = useMemo(
     () => subscriptionsData.reduce((sum, s) => sum + s.amount, 0),
-    [],
+    [subscriptionsData],
   );
   const loanMonthlyTotal = useMemo(
     () =>
@@ -68,14 +72,14 @@ export default function ExpenseTabScreen() {
         (sum, l) => sum + calcMonthly(l.principal, l.annual_rate, l.term_years),
         0,
       ),
-    [],
+    [loansData],
   );
   const recurringTotal = subsTotal + loanMonthlyTotal;
 
   // Scheduled total
   const schedTotal = useMemo(
     () => scheduledExpensesData.reduce((sum, s) => sum + s.amount, 0),
-    [],
+    [scheduledExpensesData],
   );
 
   const hasUsd = expenseData.some((e) => e.currency === 'USD');
@@ -85,7 +89,7 @@ export default function ExpenseTabScreen() {
     if (expenseFilter === 'すべて') return expenseData;
     if (expenseFilter === '固定費') return expenseData.filter((e) => e.type === 'fixed');
     return expenseData.filter((e) => e.type === 'variable');
-  }, [expenseFilter]);
+  }, [expenseFilter, expenseData]);
 
   const showScheduledInVariable = expenseFilter === '変動費';
 

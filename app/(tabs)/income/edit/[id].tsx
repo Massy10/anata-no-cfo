@@ -9,12 +9,13 @@ import { spacing } from '@/theme/tokens';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { getRate, toJPY } from '@/lib/fx';
-import { incomeData } from '@/constants/mockData';
+import { useIncome } from '@/hooks/useIncome';
 
 export default function EditIncomeScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: incomeData, update } = useIncome();
   const item = incomeData.find((i) => i.id === id);
 
   const [currency, setCurrency] = useState<'JPY' | 'USD'>(item?.currency ?? 'JPY');
@@ -38,7 +39,11 @@ export default function EditIncomeScreen() {
   const jpyAmt = currency === 'USD' ? Math.round(numAmount * rate) : numAmount;
   const sym = currency === 'USD' ? '$' : '¥';
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await update(item!.id, {
+      amount: parseFloat(amount) || item!.amount,
+      currency,
+    });
     Alert.alert('保存完了', '収入データを更新しました。', [
       { text: 'OK', onPress: () => router.back() },
     ]);

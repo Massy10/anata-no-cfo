@@ -9,12 +9,13 @@ import { spacing } from '@/theme/tokens';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { getRate, toJPY } from '@/lib/fx';
-import { expenseData } from '@/constants/mockData';
+import { useExpenses } from '@/hooks/useExpenses';
 
 export default function EditExpenseScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: expenseData, update } = useExpenses();
   const item = expenseData.find((e) => e.id === id);
 
   const [currency, setCurrency] = useState<'JPY' | 'USD'>(item?.currency ?? 'JPY');
@@ -37,7 +38,8 @@ export default function EditExpenseScreen() {
   const sym = isUSD ? '$' : '¥';
   const isFixed = item.type === 'fixed';
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await update(item!.id, { currency });
     Alert.alert('保存完了', '支出データを更新しました。', [
       { text: 'OK', onPress: () => router.back() },
     ]);
