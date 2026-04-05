@@ -24,8 +24,8 @@ export default function LoanDetailScreen() {
   const item = loansData.find((l) => l.id === id);
 
   // Simulation state - initialize after finding item
-  const [simRate, setSimRate] = useState(item?.annualRate ?? 1);
-  const [simTerm, setSimTerm] = useState(item?.termYears ?? 10);
+  const [simRate, setSimRate] = useState(item?.annual_rate ?? 1);
+  const [simTerm, setSimTerm] = useState(item?.term_years ?? 10);
 
   if (!item) {
     return (
@@ -40,8 +40,8 @@ export default function LoanDetailScreen() {
     );
   }
 
-  const monthly = calcMonthly(item.principal, item.annualRate, item.termYears);
-  const total = calcTotal(item.principal, item.annualRate, item.termYears);
+  const monthly = calcMonthly(item.principal, item.annual_rate, item.term_years);
+  const total = calcTotal(item.principal, item.annual_rate, item.term_years);
   const interest = total - item.principal;
 
   // Simulation
@@ -69,50 +69,33 @@ export default function LoanDetailScreen() {
       >
         {/* Hero section */}
         <View style={styles.hero}>
-          <View
-            style={[
-              styles.heroIcon,
-              {
-                backgroundColor: colors.orange + '14',
-                shadowColor: colors.heroShadow,
-              },
-            ]}
-          >
-            <Text style={styles.heroEmoji}>{item.icon}</Text>
-          </View>
+          <Text style={styles.heroEmoji}>{item.icon}</Text>
           <Text style={[styles.heroName, { color: colors.t1 }]}>{item.name}</Text>
           <Text style={[styles.heroAmount, { color: colors.orange }]}>
-            ¥{monthly.toLocaleString()}/月
+            ¥{monthly.toLocaleString()}
+            <Text style={{ fontSize: 17, color: colors.t2 }}>/月</Text>
           </Text>
         </View>
 
         {/* Loan info */}
         <SectionCard header="ローン情報">
-          <TableRow icon="🏦" title="借入先" right={item.lender} />
-          <TableRow
-            icon="💰"
-            title="借入額"
-            right={`¥${item.principal.toLocaleString()}`}
-          />
-          <TableRow
-            icon="📊"
-            title="金利（年）"
-            right={`${item.annualRate}%`}
-          />
-          <TableRow icon="📅" title="返済期間" right={`${item.termYears}年`} />
-          <TableRow icon="🗓" title="返済開始" right={item.startDate} />
-          <TableRow
-            icon="💵"
-            title="総支払額"
-            right={`¥${total.toLocaleString()}`}
-          />
-          <TableRow
-            icon="📉"
-            title="うち利息"
-            right={`¥${interest.toLocaleString()}`}
-            rightColor={colors.red}
-            last
-          />
+          {[
+            ['借入先', item.bank_name],
+            ['借入額', `¥${item.principal.toLocaleString()}`],
+            ['金利（年）', `${item.annual_rate}%`],
+            ['返済期間', `${item.term_years}年（${item.term_years * 12}回）`],
+            ['返済開始', item.start_date],
+            ['総支払額', `¥${total.toLocaleString()}`],
+            ['うち利息', `¥${interest.toLocaleString()}`],
+          ].map(([label, value], i) => (
+            <TableRow
+              key={i}
+              title={label}
+              right={value}
+              rightColor={i >= 5 ? colors.orange : colors.t2}
+              last={i === 6}
+            />
+          ))}
         </SectionCard>
 
         {/* Simulation */}
@@ -120,17 +103,15 @@ export default function LoanDetailScreen() {
           header="返済シミュレーション"
           footer="金利・期間を変更すると毎月の支払額が即時算出されます"
         >
-          {/* Rate slider */}
-          <View style={styles.sliderRow}>
-            <Text style={[styles.sliderLabel, { color: colors.t2 }]}>
-              金利（年）
-            </Text>
-            <View style={styles.sliderControl}>
+          <View style={{ padding: 16 }}>
+            {/* Rate slider */}
+            <View style={{ marginBottom: 16 }}>
+              <View style={styles.sliderHeader}>
+                <Text style={[styles.sliderLabel, { color: colors.t2 }]}>金利（年）</Text>
+                <Text style={[styles.sliderValue, { color: colors.orange }]}>{simRate.toFixed(2)}%</Text>
+              </View>
               <View
-                style={[
-                  styles.sliderTrack,
-                  { backgroundColor: colors.fill },
-                ]}
+                style={[styles.sliderTrack, { backgroundColor: colors.fill }]}
               >
                 <View
                   style={[
@@ -142,116 +123,70 @@ export default function LoanDetailScreen() {
                   ]}
                 />
               </View>
-              <TextInput
-                style={[
-                  styles.sliderInput,
-                  { color: colors.t1, borderColor: colors.sep, backgroundColor: colors.bg2 },
-                ]}
-                value={simRate.toFixed(2)}
-                onChangeText={(v) => {
-                  const n = parseFloat(v);
-                  if (!isNaN(n) && n >= 0 && n <= 5) setSimRate(n);
-                }}
-                keyboardType="decimal-pad"
-              />
-              <Text style={[styles.sliderUnit, { color: colors.t2 }]}>%</Text>
+              <View style={styles.sliderRangeRow}>
+                <Text style={[styles.sliderRangeText, { color: colors.t3 }]}>0%</Text>
+                <Text style={[styles.sliderRangeText, { color: colors.t3 }]}>5%</Text>
+              </View>
             </View>
-            <Text style={[styles.sliderRange, { color: colors.t3 }]}>
-              0% ~ 5%
-            </Text>
-          </View>
 
-          {/* Term slider */}
-          <View style={[styles.sliderRow, { borderTopWidth: 0.5, borderTopColor: colors.sep }]}>
-            <Text style={[styles.sliderLabel, { color: colors.t2 }]}>
-              返済期間
-            </Text>
-            <View style={styles.sliderControl}>
+            {/* Term slider */}
+            <View style={{ marginBottom: 16 }}>
+              <View style={styles.sliderHeader}>
+                <Text style={[styles.sliderLabel, { color: colors.t2 }]}>返済期間</Text>
+                <Text style={[styles.sliderValue, { color: colors.orange }]}>{simTerm}年</Text>
+              </View>
               <View
-                style={[
-                  styles.sliderTrack,
-                  { backgroundColor: colors.fill },
-                ]}
+                style={[styles.sliderTrack, { backgroundColor: colors.fill }]}
               >
                 <View
                   style={[
                     styles.sliderFill,
                     {
                       backgroundColor: colors.orange,
-                      width: `${(simTerm / 50) * 100}%`,
+                      width: `${((simTerm - 1) / 49) * 100}%`,
                     },
                   ]}
                 />
               </View>
-              <TextInput
-                style={[
-                  styles.sliderInput,
-                  { color: colors.t1, borderColor: colors.sep, backgroundColor: colors.bg2 },
-                ]}
-                value={String(simTerm)}
-                onChangeText={(v) => {
-                  const n = parseInt(v, 10);
-                  if (!isNaN(n) && n >= 1 && n <= 50) setSimTerm(n);
-                }}
-                keyboardType="number-pad"
-              />
-              <Text style={[styles.sliderUnit, { color: colors.t2 }]}>年</Text>
+              <View style={styles.sliderRangeRow}>
+                <Text style={[styles.sliderRangeText, { color: colors.t3 }]}>1年</Text>
+                <Text style={[styles.sliderRangeText, { color: colors.t3 }]}>50年</Text>
+              </View>
             </View>
-            <Text style={[styles.sliderRange, { color: colors.t3 }]}>
-              1年 ~ 50年
-            </Text>
-          </View>
 
-          {/* Result */}
-          <View
-            style={[
-              styles.simResult,
-              { borderTopWidth: 0.5, borderTopColor: colors.sep },
-            ]}
-          >
-            <View style={styles.simResultRow}>
-              <Text style={[styles.simResultLabel, { color: colors.t2 }]}>
-                毎月の支払額
-              </Text>
-              <Text style={[styles.simResultAmount, { color: colors.orange }]}>
-                ¥{simMonthly.toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.simResultRow}>
-              <Text style={[styles.simInterestLabel, { color: colors.t2 }]}>
-                総利息額
-              </Text>
-              <Text style={[styles.simInterestAmount, { color: colors.red }]}>
-                ¥{simInterest.toLocaleString()}
-              </Text>
+            {/* Results */}
+            <View style={[styles.simResult, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.sep }]}>
+              <View>
+                <Text style={{ fontSize: 11, color: colors.t2 }}>毎月の支払額</Text>
+                <Text style={{ fontSize: 28, fontWeight: '300', color: colors.orange, marginTop: 2 }}>
+                  ¥{simMonthly.toLocaleString()}
+                </Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={{ fontSize: 11, color: colors.t2 }}>総利息額</Text>
+                <Text style={{ fontSize: 17, fontWeight: '400', color: colors.red, marginTop: 2 }}>
+                  ¥{simInterest.toLocaleString()}
+                </Text>
+              </View>
             </View>
           </View>
         </SectionCard>
 
         {/* Actions */}
         <SectionCard header="アクション">
-          <TableRow
-            icon="💹"
-            title="繰上返済を記録"
-            iconBg={colors.blue + '21'}
-            rightColor={colors.blue}
-            onPress={() => {}}
-          />
-          <TableRow
-            icon="📝"
-            title="条件変更"
-            iconBg={colors.orange + '21'}
-            rightColor={colors.orange}
-            onPress={() => {}}
-          />
-          <TableRow
-            icon="🗑"
-            title="削除"
-            iconBg={colors.red + '14'}
-            rightColor={colors.red}
-            last
-            onPress={() => {}}
-          />
+          {[
+            ['繰上返済を記録', colors.blue],
+            ['条件変更', colors.orange],
+            ['削除', colors.red],
+          ].map(([label, color], i) => (
+            <TableRow
+              key={i}
+              title={label}
+              rightColor={color}
+              last={i === 2}
+              onPress={() => {}}
+            />
+          ))}
         </SectionCard>
       </ScrollView>
     </SafeAreaView>
@@ -272,19 +207,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    paddingVertical: 28,
-  },
-  heroIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 4,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   heroEmoji: {
     fontSize: 48,
@@ -292,28 +216,27 @@ const styles = StyleSheet.create({
   heroName: {
     fontSize: 22,
     fontWeight: '600',
-    marginBottom: 4,
+    marginTop: 8,
   },
   heroAmount: {
     fontSize: 34,
-    fontWeight: '500',
+    fontWeight: '300',
+    marginTop: 8,
   },
   // Slider
-  sliderRow: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+  sliderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
   },
   sliderLabel: {
-    fontSize: fontSize.caption,
-    marginBottom: 8,
+    fontSize: 13,
   },
-  sliderControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  sliderValue: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   sliderTrack: {
-    flex: 1,
     height: 6,
     borderRadius: 3,
     overflow: 'hidden',
@@ -322,46 +245,18 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  sliderInput: {
-    width: 64,
-    height: 36,
-    borderRadius: 8,
-    borderWidth: 1,
-    textAlign: 'center',
-    fontSize: fontSize.body,
-    fontWeight: '500',
+  sliderRangeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  sliderUnit: {
-    fontSize: fontSize.caption,
-    width: 20,
-  },
-  sliderRange: {
-    fontSize: fontSize.smallCaption,
-    marginTop: 6,
+  sliderRangeText: {
+    fontSize: 11,
   },
   // Sim result
   simResult: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  simResultRow: {
+    paddingTop: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  simResultLabel: {
-    fontSize: fontSize.body,
-  },
-  simResultAmount: {
-    fontSize: 28,
-    fontWeight: '500',
-  },
-  simInterestLabel: {
-    fontSize: fontSize.body,
-  },
-  simInterestAmount: {
-    fontSize: 17,
-    fontWeight: '500',
+    alignItems: 'baseline',
   },
 });

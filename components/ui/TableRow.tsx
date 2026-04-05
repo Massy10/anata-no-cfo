@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '@/theme/useTheme';
 import { radius, fontSize, spacing } from '@/theme/tokens';
 
@@ -43,7 +44,7 @@ export function TableRow({
         <View
           style={[
             styles.iconBox,
-            { backgroundColor: iconBg ?? colors.bg3 },
+            { backgroundColor: iconBg ?? colors.fill },
           ]}
         >
           <Text style={styles.iconEmoji}>{icon}</Text>
@@ -55,14 +56,14 @@ export function TableRow({
           <Text style={[styles.title, { color: colors.t1 }]} numberOfLines={1}>
             {title}
           </Text>
-          {badge != null && badgeColor != null && (
+          {badge != null && (
             <View
               style={[
                 styles.badge,
-                { backgroundColor: badgeColor + '21' },
+                { backgroundColor: (badgeColor ?? colors.cyan) + '22' },
               ]}
             >
-              <Text style={[styles.badgeText, { color: badgeColor }]}>
+              <Text style={[styles.badgeText, { color: badgeColor ?? colors.cyan }]}>
                 {badge}
               </Text>
             </View>
@@ -95,7 +96,15 @@ export function TableRow({
       </View>
 
       {onPress != null && (
-        <Text style={[styles.chevron, { color: colors.t3 }]}>{'›'}</Text>
+        <Svg width={8} height={14} viewBox="0 0 8 14" fill="none" style={styles.chevron}>
+          <Path
+            d="M1 1L7 7L1 13"
+            stroke={colors.t3}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
       )}
     </View>
   );
@@ -117,7 +126,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: spacing.rowMinHeight,
     paddingHorizontal: 16,
-    paddingVertical: 8,
   },
   iconBox: {
     width: spacing.rowIconSize,
@@ -126,6 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    flexShrink: 0,
   },
   iconEmoji: {
     fontSize: 16,
@@ -133,10 +142,12 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
+    paddingVertical: 10,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   title: {
     fontSize: fontSize.body,
@@ -146,7 +157,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.badge,
     paddingHorizontal: 6,
     paddingVertical: 1,
-    marginLeft: 8,
   },
   badgeText: {
     fontSize: fontSize.smallCaption,
@@ -154,11 +164,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: fontSize.caption,
-    marginTop: 2,
+    marginTop: 1,
   },
   rightSection: {
     alignItems: 'flex-end',
     marginLeft: 8,
+    flexShrink: 0,
   },
   rightText: {
     fontSize: fontSize.body,
@@ -169,9 +180,8 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   chevron: {
-    fontSize: 20,
-    fontWeight: '300',
-    marginLeft: 4,
+    marginLeft: 6,
+    flexShrink: 0,
   },
 });
 

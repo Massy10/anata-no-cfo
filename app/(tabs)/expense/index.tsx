@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
 import { radius, fontSize, spacing } from '@/theme/tokens';
@@ -53,8 +54,8 @@ export default function ExpenseTabScreen() {
   );
 
   const diff = totalExpense - LAST_MONTH_TOTAL;
-  const diffPct = ((diff / LAST_MONTH_TOTAL) * 100).toFixed(1);
-  const diffUp = diff >= 0;
+  const diffPct = Math.round((diff / LAST_MONTH_TOTAL) * 100);
+  const diffUp = diff > 0;
 
   // Recurring totals
   const subsTotal = useMemo(
@@ -64,7 +65,7 @@ export default function ExpenseTabScreen() {
   const loanMonthlyTotal = useMemo(
     () =>
       loansData.reduce(
-        (sum, l) => sum + calcMonthly(l.principal, l.annualRate, l.termYears),
+        (sum, l) => sum + calcMonthly(l.principal, l.annual_rate, l.term_years),
         0,
       ),
     [],
@@ -76,6 +77,8 @@ export default function ExpenseTabScreen() {
     () => scheduledExpensesData.reduce((sum, s) => sum + s.amount, 0),
     [],
   );
+
+  const hasUsd = expenseData.some((e) => e.currency === 'USD');
 
   // Filter expenses
   const filteredExpenses = useMemo(() => {
@@ -101,15 +104,15 @@ export default function ExpenseTabScreen() {
               style={[
                 styles.pill,
                 {
-                  backgroundColor: active ? colors.red + '21' : 'transparent',
-                  borderColor: active ? colors.red : colors.sep,
+                  backgroundColor: active ? colors.red + '1A' : 'transparent',
+                  borderColor: active ? colors.red + '33' : colors.sep,
                 },
               ]}
             >
               <Text
                 style={[
                   styles.pillText,
-                  { color: active ? colors.red : colors.t2 },
+                  { color: active ? colors.red : colors.t3, fontWeight: active ? '600' : '400' },
                 ]}
               >
                 {f}
@@ -129,20 +132,20 @@ export default function ExpenseTabScreen() {
           const sym = isUSD ? '$' : '¥';
           const isFixed = item.type === 'fixed';
 
-          let subtitle = `${item.method} · ${item.tag} · ${item.date}`;
+          let subtitle = `${item.payment_method} · ${item.tag} · ${item.date}`;
           if (isUSD) subtitle += ` · ¥${jpyAmt.toLocaleString()}換算`;
 
           return (
             <TableRow
               key={item.id}
               icon={item.icon}
-              iconBg={isFixed ? colors.cyan + '21' : colors.red + '14'}
+              iconBg={isFixed ? colors.cyan + '22' : colors.red + '15'}
               title={item.name}
               subtitle={subtitle}
               badge={isUSD ? 'USD' : isFixed ? '固定' : undefined}
-              badgeColor={isUSD ? colors.purple : colors.cyan}
+              badgeColor={isUSD ? colors.purple : undefined}
               right={`${sym}${item.amount.toLocaleString()}`}
-              rightSub={isUSD ? `@${rate} JPY/USD` : undefined}
+              rightSub={isUSD ? `@${rate}` : undefined}
               last={idx === filteredExpenses.length - 1}
               onPress={() => router.push(`/expense/${item.id}`)}
             />
@@ -156,17 +159,20 @@ export default function ExpenseTabScreen() {
     <>
       {/* Combined total card */}
       <View style={[styles.recurringHero, { backgroundColor: colors.heroGlass, borderColor: colors.heroBorder }]}>
+        <BlurView intensity={8} style={StyleSheet.absoluteFill} />
         <Text style={[styles.recurringLabel, { color: colors.cyan }]}>
           定期支出 合計
         </Text>
-        <Text style={[styles.recurringAmount, { color: colors.t1 }]}>
-          ¥{recurringTotal.toLocaleString()}/月
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 4 }}>
+          <Text style={{ fontSize: 24, fontWeight: '500', color: colors.t1 }}>
+            ¥{recurringTotal.toLocaleString()}
+          </Text>
+          <Text style={{ fontSize: 14, color: colors.t2, fontWeight: '400' }}>/月</Text>
+        </View>
         <View style={styles.recurringBreakdown}>
           <Text style={[styles.breakdownText, { color: colors.purple }]}>
             サブスク ¥{subsTotal.toLocaleString()}
           </Text>
-          <Text style={[styles.breakdownSep, { color: colors.t3 }]}> + </Text>
           <Text style={[styles.breakdownText, { color: colors.orange }]}>
             ローン ¥{loanMonthlyTotal.toLocaleString()}
           </Text>
@@ -181,10 +187,11 @@ export default function ExpenseTabScreen() {
           <TableRow
             key={s.id}
             icon={s.icon}
-            iconBg={colors.purple + '21'}
+            iconBg={colors.purple + '22'}
             title={s.name}
+            subtitle={`${s.card} · ${s.cycle}`}
             right={`¥${s.amount.toLocaleString()}`}
-            rightSub={`次回 ${s.nextDate}`}
+            rightSub={`次回 ${s.next_payment_date}`}
             last={idx === subscriptionsData.length - 1}
             onPress={() => router.push(`/expense/sub/${s.id}`)}
           />
@@ -196,18 +203,20 @@ export default function ExpenseTabScreen() {
         header={`ローン ${loansData.length}件 · ¥${loanMonthlyTotal.toLocaleString()}/月`}
       >
         {loansData.map((l, idx) => {
-          const monthly = calcMonthly(l.principal, l.annualRate, l.termYears);
-          const total = calcTotal(l.principal, l.annualRate, l.termYears);
+          const monthly = calcMonthly(l.principal, l.annual_rate, l.term_years);
+          const total = calcTotal(l.principal, l.annual_rate, l.term_years);
           const totalMan = Math.round(total / 10000);
           return (
             <TableRow
               key={l.id}
               icon={l.icon}
-              iconBg={colors.orange + '21'}
+              iconBg={colors.orange + '22'}
               title={l.name}
-              badge={`金利${l.annualRate}%`}
+              subtitle={`${l.bank_name} · ${l.annual_rate}% · ${l.term_years}年`}
+              badge={`金利${l.annual_rate}%`}
               badgeColor={colors.orange}
               right={`¥${monthly.toLocaleString()}/月`}
+              rightColor={colors.orange}
               rightSub={`総額 ¥${totalMan.toLocaleString()}万`}
               last={idx === loansData.length - 1}
               onPress={() => router.push(`/expense/loan/${l.id}`)}
@@ -230,6 +239,14 @@ export default function ExpenseTabScreen() {
             <CreditCardVisual card={card} />
             {/* Usage bar */}
             <View style={styles.usageBarOuter}>
+              <View style={[styles.usageTextRow, { marginBottom: 4 }]}>
+                <Text style={[styles.usagePct, { color: colors.t2 }]}>
+                  利用率 {usagePct}%
+                </Text>
+                <Text style={[styles.usageLimit, { color: colors.t2 }]}>
+                  限度額 ¥{card.credit_limit.toLocaleString()}
+                </Text>
+              </View>
               <View
                 style={[styles.usageBarBg, { backgroundColor: colors.fill }]}
               >
@@ -242,14 +259,6 @@ export default function ExpenseTabScreen() {
                     },
                   ]}
                 />
-              </View>
-              <View style={styles.usageTextRow}>
-                <Text style={[styles.usagePct, { color: colors.t2 }]}>
-                  {usagePct}% 使用
-                </Text>
-                <Text style={[styles.usageLimit, { color: colors.t3 }]}>
-                  限度額 ¥{card.credit_limit.toLocaleString()}
-                </Text>
               </View>
             </View>
           </View>
@@ -264,7 +273,7 @@ export default function ExpenseTabScreen() {
       <View
         style={[
           styles.schedHero,
-          { backgroundColor: colors.heroGlass, borderColor: colors.heroBorder },
+          { backgroundColor: colors.bg2 },
         ]}
       >
         <Text style={[styles.schedLabel, { color: colors.orange }]}>
@@ -277,17 +286,20 @@ export default function ExpenseTabScreen() {
 
       <SectionCard>
         {scheduledExpensesData.map((item, idx) => {
-          const badgeColor = item.monthsAway < 5 ? colors.orange : colors.cyan;
+          const months = Math.round((item.days ?? 0) / 30);
+          const badgeText = months <= 1 ? '今月中' : months < 12 ? `${months}ヶ月後` : `${Math.round(months / 12)}年後`;
+          const badgeColor = months < 5 ? colors.orange : colors.cyan;
           return (
             <TableRow
               key={item.id}
               icon={item.icon}
-              iconBg={colors.orange + '14'}
+              iconBg={colors.orange + '22'}
               title={item.name}
-              subtitle={item.dueDate}
-              badge={`${item.monthsAway}ヶ月後`}
+              subtitle={`${item.scheduled_date} · ${item.memo}`}
+              badge={badgeText}
               badgeColor={badgeColor}
               right={`¥${item.amount.toLocaleString()}`}
+              rightColor={colors.orange}
               last={idx === scheduledExpensesData.length - 1}
             />
           );
@@ -309,36 +321,38 @@ export default function ExpenseTabScreen() {
         <View
           style={[
             styles.summaryCard,
+            styles.cardShadow,
             {
               backgroundColor: colors.heroGlass,
               borderColor: colors.heroBorder,
-              borderWidth: 1,
+              borderWidth: StyleSheet.hairlineWidth,
             },
           ]}
         >
+          <BlurView intensity={8} style={StyleSheet.absoluteFill} />
           <Text style={[styles.summaryLabel, { color: colors.red }]}>
-            今月の支出
+            今月の支出{hasUsd ? ' (円換算)' : ''}
           </Text>
           <Text style={[styles.summaryAmount, { color: colors.t1 }]}>
             ¥{totalExpense.toLocaleString()}
           </Text>
         </View>
 
-        <View style={{ width: spacing.cardGap }} />
+        <View style={{ width: 6 }} />
 
         <View
           style={[
-            styles.summaryCard,
+            styles.momCard,
             {
-              backgroundColor: diffUp ? colors.red + '14' : colors.green + '14',
-              borderColor: diffUp ? colors.red + '33' : colors.green + '33',
-              borderWidth: 1,
+              backgroundColor: diffUp ? colors.red + '10' : colors.green + '10',
+              borderColor: diffUp ? colors.red + '22' : colors.green + '22',
+              borderWidth: StyleSheet.hairlineWidth,
             },
           ]}
         >
           <Text
             style={[
-              styles.summaryLabel,
+              styles.momLabel,
               { color: diffUp ? colors.red : colors.green },
             ]}
           >
@@ -346,19 +360,19 @@ export default function ExpenseTabScreen() {
           </Text>
           <Text
             style={[
-              styles.summaryDiff,
-              { color: diffUp ? colors.red : colors.green },
+              styles.momDiff,
+              { color: colors.t1 },
             ]}
           >
-            {diffUp ? '↑' : '↓'} ¥{Math.abs(diff).toLocaleString()}
+            {diffUp ? '+' : ''}¥{diff.toLocaleString()}
           </Text>
           <Text
             style={[
-              styles.summaryPct,
+              styles.momPct,
               { color: diffUp ? colors.red : colors.green },
             ]}
           >
-            {diffUp ? '+' : ''}{diffPct}%
+            {diffUp ? '↑' : '↓'}{Math.abs(diffPct)}%
           </Text>
         </View>
       </View>
@@ -386,84 +400,95 @@ const styles = StyleSheet.create({
   },
   summaryRow: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.screenPaddingH,
-    marginBottom: spacing.sectionMarginBottom,
+    gap: 6,
+    marginHorizontal: 16,
+    marginBottom: 12,
   },
   summaryCard: {
     flex: 1,
-    borderRadius: radius.hero,
-    padding: spacing.cardPadding,
+    borderRadius: 12,
+    padding: 12,
+    overflow: 'hidden',
+  },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   summaryLabel: {
-    fontSize: fontSize.smallCaption,
+    fontSize: 11,
     fontWeight: '500',
-    marginBottom: 4,
   },
   summaryAmount: {
     fontSize: 20,
     fontWeight: '500',
-  },
-  summaryDiff: {
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  summaryPct: {
-    fontSize: fontSize.caption,
     marginTop: 2,
   },
+  momCard: {
+    flex: 1,
+    borderRadius: 10,
+    padding: 10,
+  },
+  momLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  momDiff: {
+    fontSize: 18,
+    fontWeight: '300',
+    marginTop: 2,
+  },
+  momPct: {
+    fontSize: 11,
+    marginTop: 1,
+  },
   filterRow: {
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 16,
     paddingBottom: 12,
-    gap: 8,
+    gap: 5,
   },
   pill: {
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    minHeight: 32,
-    justifyContent: 'center',
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   pillText: {
-    fontSize: fontSize.caption,
-    fontWeight: '500',
+    fontSize: 13,
   },
   // Recurring
   recurringHero: {
-    marginHorizontal: spacing.screenPaddingH,
-    marginBottom: spacing.sectionMarginBottom,
-    borderRadius: radius.hero,
-    borderWidth: 1,
-    padding: spacing.cardPadding,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    overflow: 'hidden',
   },
   recurringLabel: {
-    fontSize: fontSize.smallCaption,
+    fontSize: 11,
     fontWeight: '500',
-    marginBottom: 4,
-  },
-  recurringAmount: {
-    fontSize: 20,
-    fontWeight: '500',
-    marginBottom: 6,
+    letterSpacing: 0.3,
   },
   recurringBreakdown: {
     flexDirection: 'row',
-    alignItems: 'center',
+    gap: 12,
+    marginTop: 6,
   },
   breakdownText: {
-    fontSize: fontSize.caption,
-    fontWeight: '500',
-  },
-  breakdownSep: {
-    fontSize: fontSize.caption,
+    fontSize: 12,
   },
   // Cards
   cardContainer: {
-    marginHorizontal: spacing.screenPaddingH,
-    marginBottom: spacing.sectionMarginBottom,
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   usageBarOuter: {
-    marginTop: 10,
+    paddingTop: 8,
+    paddingHorizontal: 4,
   },
   usageBarBg: {
     height: 6,
@@ -477,29 +502,28 @@ const styles = StyleSheet.create({
   usageTextRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 6,
   },
   usagePct: {
-    fontSize: fontSize.caption,
+    fontSize: 13,
   },
   usageLimit: {
-    fontSize: fontSize.caption,
+    fontSize: 13,
   },
   // Scheduled
   schedHero: {
-    marginHorizontal: spacing.screenPaddingH,
-    marginBottom: spacing.sectionMarginBottom,
-    borderRadius: radius.hero,
-    borderWidth: 1,
-    padding: spacing.cardPadding,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
   },
   schedLabel: {
-    fontSize: fontSize.smallCaption,
+    fontSize: 11,
     fontWeight: '500',
-    marginBottom: 4,
   },
   schedAmount: {
     fontSize: 20,
-    fontWeight: '500',
+    fontWeight: '300',
+    marginTop: 2,
   },
 });

@@ -2,6 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/useTheme';
 
+let LinearGradient: React.ComponentType<any> | null = null;
+try {
+  LinearGradient = require('expo-linear-gradient').LinearGradient;
+} catch {
+  LinearGradient = null;
+}
+
 type CardData = {
   name: string;
   last4: string;
@@ -22,11 +29,9 @@ function formatAmount(n: number): string {
 
 export function CreditCardVisual({ card }: Props) {
   const { colors } = useTheme();
-  const bgPrimary = card.color + 'CC';
-  const bgSecondary = card.color + '77';
 
-  return (
-    <View style={[styles.card, { backgroundColor: bgPrimary }]}>
+  const cardContent = (
+    <>
       {/* Decorative circles */}
       <View style={styles.decorTopRight} />
       <View style={styles.decorBottomLeft} />
@@ -47,11 +52,31 @@ export function CreditCardVisual({ card }: Props) {
           <Text style={styles.amount}>{formatAmount(card.balance)}</Text>
         </View>
         <View style={styles.rightInfo}>
-          <Text style={styles.label}>
-            締日 {card.closing_day}日 / 支払日 {card.payment_day}日
+          <Text style={styles.label}>締日/支払日</Text>
+          <Text style={styles.dateText}>
+            {card.closing_day}日 / {card.payment_day}日
           </Text>
         </View>
       </View>
+    </>
+  );
+
+  if (LinearGradient) {
+    return (
+      <LinearGradient
+        colors={[card.color + 'CC', card.color + '77']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.card}
+      >
+        {cardContent}
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <View style={[styles.card, { backgroundColor: card.color + 'CC' }]}>
+      {cardContent}
     </View>
   );
 }
@@ -62,7 +87,6 @@ const styles = StyleSheet.create({
     padding: 20,
     position: 'relative',
     overflow: 'hidden',
-    minHeight: 180,
   },
   decorTopRight: {
     position: 'absolute',
@@ -84,8 +108,8 @@ const styles = StyleSheet.create({
   },
   decorMidRight: {
     position: 'absolute',
-    top: '50%',
-    right: 10,
+    top: 20,
+    right: 60,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -94,14 +118,14 @@ const styles = StyleSheet.create({
   cardName: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.73)',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   cardNumber: {
     fontSize: 18,
     fontWeight: '300',
     letterSpacing: 4,
     color: '#FFFFFF',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   bottomRow: {
     flexDirection: 'row',
@@ -114,12 +138,16 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   amount: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '400',
     color: '#FFFFFF',
   },
   rightInfo: {
     alignItems: 'flex-end',
+  },
+  dateText: {
+    fontSize: 15,
+    color: '#FFFFFF',
   },
 });
 

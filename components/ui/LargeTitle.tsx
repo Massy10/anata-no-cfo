@@ -14,7 +14,6 @@ export function LargeTitle({ title, subtitle, nav }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.t1 }]}>{title}</Text>
       {subtitle != null && (
         <View style={styles.subtitleRow}>
           {nav ? (
@@ -28,7 +27,12 @@ export function LargeTitle({ title, subtitle, nav }: Props) {
                   {'‹'}
                 </Text>
               </TouchableOpacity>
-              <Text style={[styles.subtitle, { color: colors.t2 }]}>
+              <Text
+                style={[
+                  styles.subtitle,
+                  { color: colors.t2, flex: 1, textAlign: 'center' },
+                ]}
+              >
                 {subtitle}
               </Text>
               <TouchableOpacity
@@ -48,6 +52,7 @@ export function LargeTitle({ title, subtitle, nav }: Props) {
           )}
         </View>
       )}
+      <Text style={[styles.title, { color: colors.t1 }]}>{title}</Text>
     </View>
   );
 }
@@ -62,18 +67,21 @@ const styles = StyleSheet.create({
     fontSize: fontSize.largeTitle,
     fontWeight: '700',
     letterSpacing: 0.4,
+    lineHeight: 37.4,
   },
   subtitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    gap: 8,
   },
   subtitle: {
     fontSize: fontSize.caption,
+    fontWeight: '400',
   },
   arrow: {
-    paddingHorizontal: 8,
+    minWidth: 44,
     minHeight: 44,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   arrowText: {

@@ -55,72 +55,51 @@ export default function NewExpenseScreen() {
 
         {/* Currency toggle */}
         <View style={styles.currencyRow}>
-          <TouchableOpacity
-            style={[
-              styles.currencyPill,
-              {
-                backgroundColor:
-                  currency === 'JPY' ? colors.blue + '21' : 'transparent',
-                borderColor: currency === 'JPY' ? colors.blue : colors.sep,
-              },
-            ]}
-            onPress={() => setCurrency('JPY')}
-          >
-            <Text
+          {(['JPY', 'USD'] as const).map((v) => (
+            <TouchableOpacity
+              key={v}
               style={[
-                styles.currencyText,
-                { color: currency === 'JPY' ? colors.blue : colors.t2 },
+                styles.currencyPill,
+                {
+                  backgroundColor:
+                    currency === v ? colors.blue + '22' : 'transparent',
+                  borderColor: currency === v ? colors.blue + '44' : colors.sep,
+                },
               ]}
+              onPress={() => setCurrency(v)}
             >
-              🇯🇵 JPY
-            </Text>
-          </TouchableOpacity>
-
-          <View style={{ width: 8 }} />
-
-          <TouchableOpacity
-            style={[
-              styles.currencyPill,
-              {
-                backgroundColor:
-                  currency === 'USD' ? colors.blue + '21' : 'transparent',
-                borderColor: currency === 'USD' ? colors.blue : colors.sep,
-              },
-            ]}
-            onPress={() => setCurrency('USD')}
-          >
-            <Text
-              style={[
-                styles.currencyText,
-                { color: currency === 'USD' ? colors.blue : colors.t2 },
-              ]}
-            >
-              🇺🇸 USD
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.currencyText,
+                  { color: currency === v ? colors.blue : colors.t3, fontWeight: currency === v ? '600' : '400' },
+                ]}
+              >
+                {v === 'JPY' ? '🇯🇵 JPY' : '🇺🇸 USD'}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Form fields */}
         <SectionCard>
-          <TableRow icon="💳" title="支払手段" right="三井住友カード" onPress={() => {}} />
-          <TableRow icon="🍽" title="用途タグ" right="食費" onPress={() => {}} />
-          <TableRow icon="📅" title="日付" right="2026年4月4日" onPress={() => {}} />
-          {currency === 'USD' && (
+          {[
+            { l: '支払手段', v: '💳 三井住友カード' },
+            { l: '用途タグ', v: '🍽 食費' },
+            { l: '日付', v: '2026年4月4日' },
+            ...(currency === 'USD'
+              ? [{ l: '適用レート', v: `¥${rate} / USD（自動取得）` }]
+              : []),
+            { l: 'メモ', v: 'タップして入力' },
+          ].map((f, i, arr) => (
             <TableRow
-              icon="📊"
-              title="適用レート"
-              right={`¥${rate} / USD（自動取得）`}
-              rightColor={colors.purple}
+              key={i}
+              title={f.l}
+              right={f.v}
+              rightColor={f.l === '適用レート' ? colors.purple : colors.t2}
+              last={i === arr.length - 1}
+              onPress={() => {}}
             />
-          )}
-          <TableRow
-            icon="📝"
-            title="メモ"
-            right="タップして入力"
-            rightColor={colors.t3}
-            last
-            onPress={() => {}}
-          />
+          ))}
         </SectionCard>
 
         {/* USD info banner */}
@@ -129,14 +108,13 @@ export default function NewExpenseScreen() {
             style={[
               styles.infoBanner,
               {
-                backgroundColor: colors.purple + '12',
-                borderColor: colors.purple + '33',
+                backgroundColor: colors.purple + '11',
+                borderColor: colors.purple + '22',
               },
             ]}
           >
             <Text style={[styles.infoBannerText, { color: colors.purple }]}>
-              💱 為替レートは入力日の市場レートを自動取得します。
-              手動で変更することも可能です。
+              為替レートは入力日のレートを自動で取得します。
             </Text>
           </View>
         )}
@@ -147,19 +125,22 @@ export default function NewExpenseScreen() {
           footer="金額・日付・用途タグをAIが自動認識します"
         >
           <View style={styles.ocrRow}>
-            <TouchableOpacity
-              style={[styles.ocrButton, { borderRightWidth: 0.5, borderRightColor: colors.sep }]}
-              onPress={() => {}}
-            >
-              <Text style={[styles.ocrButtonText, { color: colors.blue }]}>
-                📷 カメラで撮影
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.ocrButton} onPress={() => {}}>
-              <Text style={[styles.ocrButtonText, { color: colors.blue }]}>
-                🖼 ライブラリから
-              </Text>
-            </TouchableOpacity>
+            {[
+              ['📷', 'カメラで撮影'],
+              ['🖼', 'ライブラリから'],
+            ].map(([ic, lb], i) => (
+              <TouchableOpacity
+                key={i}
+                style={[
+                  styles.ocrHalf,
+                  i === 0 && { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: colors.sep },
+                ]}
+                onPress={() => {}}
+              >
+                <Text style={styles.ocrIcon}>{ic}</Text>
+                <Text style={[styles.ocrLabel, { color: colors.blue }]}>{lb}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </SectionCard>
       </ScrollView>
@@ -173,14 +154,15 @@ const styles = StyleSheet.create({
   },
   amountSection: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingTop: 8,
+    paddingBottom: 4,
   },
   amountHint: {
-    fontSize: fontSize.smallCaption,
-    marginBottom: 8,
+    fontSize: 11,
+    marginBottom: 4,
   },
   amountDisplay: {
-    fontSize: fontSize.inputAmount,
+    fontSize: 48,
     fontWeight: '200',
   },
   conversionPreview: {
@@ -190,44 +172,45 @@ const styles = StyleSheet.create({
   currencyRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingHorizontal: spacing.screenPaddingH,
-    marginBottom: 20,
+    gap: 8,
+    paddingTop: 4,
+    paddingBottom: 16,
   },
   currencyPill: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    minHeight: 44,
-    justifyContent: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   currencyText: {
-    fontSize: fontSize.body,
-    fontWeight: '500',
+    fontSize: 13,
   },
   infoBanner: {
-    marginHorizontal: spacing.screenPaddingH,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    padding: spacing.cardPadding,
-    marginBottom: spacing.sectionMarginBottom,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   infoBannerText: {
-    fontSize: fontSize.caption,
-    lineHeight: 20,
+    fontSize: 11,
   },
   ocrRow: {
     flexDirection: 'row',
-    minHeight: 52,
   },
-  ocrButton: {
+  ocrHalf: {
     flex: 1,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 52,
+    minHeight: 44,
   },
-  ocrButtonText: {
-    fontSize: fontSize.body,
-    fontWeight: '500',
+  ocrIcon: {
+    fontSize: 22,
+  },
+  ocrLabel: {
+    fontSize: 13,
+    marginTop: 4,
   },
 });

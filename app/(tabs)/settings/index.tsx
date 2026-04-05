@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
@@ -15,16 +16,24 @@ import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { useAuth } from '@/contexts/AuthContext';
 import Svg, { Path } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
+
+let BlurView: React.ComponentType<any> | null = null;
+try {
+  BlurView = require('expo-blur').BlurView;
+} catch {
+  BlurView = null;
+}
 
 type AppearanceMode = 'light' | 'dark' | 'system';
 
 function CheckIcon({ color }: { color: string }) {
   return (
-    <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
+    <Svg width={16} height={16} viewBox="0 0 16 16" fill="none">
       <Path
-        d="M3 9.5L7 13.5L15 4.5"
+        d="M3 8L6.5 11.5L13 4.5"
         stroke={color}
-        strokeWidth={2}
+        strokeWidth={2.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -65,15 +74,14 @@ export default function SettingsScreen() {
         {/* B. Profile Section */}
         <SectionCard>
           <TouchableOpacity style={styles.profileRow} activeOpacity={0.5}>
-            <View style={[styles.avatarCircle, { backgroundColor: colors.blue }]}>
-              <View
-                style={[
-                  styles.avatarOverlay,
-                  { backgroundColor: colors.purple, opacity: 0.5 },
-                ]}
-              />
+            <LinearGradient
+              colors={[colors.blue, colors.purple]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.avatarCircle}
+            >
               <Text style={styles.avatarInitial}>{initial}</Text>
-            </View>
+            </LinearGradient>
             <View style={styles.profileCenter}>
               <Text style={[styles.profileName, { color: colors.t1 }]}>
                 {displayName}
@@ -82,22 +90,26 @@ export default function SettingsScreen() {
                 {email}
               </Text>
             </View>
-            <View style={[styles.planBadge, { backgroundColor: colors.bg3 }]}>
-              <Text style={[styles.planBadgeText, { color: colors.t2 }]}>
+            <View style={styles.planSection}>
+              <Text style={[styles.planText, { color: colors.t2 }]}>
                 {plan === 'pro' ? 'Pro' : 'Free'}
               </Text>
             </View>
-            <Text style={[styles.chevron, { color: colors.t3 }]}>{'\u203a'}</Text>
+            <Svg width={8} height={14} viewBox="0 0 8 14" fill="none">
+              <Path d="M1 1L7 7L1 13" stroke={colors.t3} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
           </TouchableOpacity>
         </SectionCard>
 
         {/* C. Pro Upgrade Card */}
         <View style={styles.proCardOuter}>
-          <View
+          <LinearGradient
+            colors={[colors.blue + '12', colors.purple + '08']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
             style={[
               styles.proCard,
               {
-                backgroundColor: colors.blue + '12',
                 borderColor: colors.blue + '33',
               },
             ]}
@@ -105,7 +117,7 @@ export default function SettingsScreen() {
             <View
               style={[
                 styles.proDecor,
-                { backgroundColor: colors.blue + '0D' },
+                { backgroundColor: colors.blue + '08' },
               ]}
             />
             <Text style={[styles.proTitle, { color: colors.t1 }]}>
@@ -122,47 +134,58 @@ export default function SettingsScreen() {
                     backgroundColor: colors.heroGlass as string,
                     borderColor: colors.heroBorder as string,
                     borderWidth: 0.5,
+                    overflow: 'hidden',
                   },
                 ]}
                 activeOpacity={0.7}
               >
+                {BlurView && Platform.OS === 'ios' && (
+                  <BlurView intensity={8} tint="default" style={StyleSheet.absoluteFill} />
+                )}
                 <Text style={[styles.priceBtnText, { color: colors.blue }]}>
                   {'\u00a5300/\u6708'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.priceBtn, styles.priceBtnAnnual]}
+                style={styles.priceBtnAnnualWrap}
                 activeOpacity={0.7}
               >
-                <Text style={styles.priceBtnAnnualText}>
-                  {'\u00a53,000/\u5e74'}
-                </Text>
-                <Text style={styles.priceBtnAnnualSub}>
-                  {'2\u30f6\u6708\u5206\u304a\u5f97'}
-                </Text>
+                <LinearGradient
+                  colors={[colors.blue, colors.purple]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.priceBtnAnnual}
+                >
+                  <Text style={styles.priceBtnAnnualText}>
+                    {'\u00a53,000/\u5e74'}
+                  </Text>
+                  <Text style={styles.priceBtnAnnualSub}>
+                    {'2\u30f6\u6708\u5206\u304a\u5f97'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-          </View>
+          </LinearGradient>
         </View>
 
         {/* D. CFO\u8a2d\u5b9a */}
         <SectionCard header={'CFO\u8a2d\u5b9a'}>
           <TableRow
             icon={'\ud83e\udde0'}
-            iconBg={colors.purple + '21'}
+            iconBg={colors.purple + '22'}
             title={'CFO\u540d'}
             right={cfoName}
           />
           <TableRow
             icon={'\ud83c\udfaf'}
-            iconBg={colors.blue + '21'}
+            iconBg={colors.blue + '22'}
             title={'\u76ee\u6a19\u7dcf\u8cc7\u7523'}
             right={goalAsset.toLocaleString() + '\u4e07\u5186'}
             rightColor={colors.blue}
           />
           <TableRow
             icon={'\ud83d\udcc8'}
-            iconBg={colors.green + '21'}
+            iconBg={colors.green + '22'}
             title={'\u6708\u9593\u76ee\u6a19CF'}
             right={'+' + goalCf + '\u4e07\u5186'}
             rightColor={colors.green}
@@ -174,13 +197,13 @@ export default function SettingsScreen() {
         <SectionCard header={'\u4e00\u822c'}>
           <TableRow
             icon={'\ud83d\udcb4'}
-            iconBg={colors.orange + '21'}
+            iconBg={colors.orange + '22'}
             title={'\u901a\u8ca8'}
             right={'JPY\uff08\u65e5\u672c\u5186\uff09'}
           />
           <TableRow
             icon={'\ud83c\udf10'}
-            iconBg={colors.blue + '21'}
+            iconBg={colors.blue + '22'}
             title={'\u8a00\u8a9e'}
             right={'\u65e5\u672c\u8a9e'}
             last
@@ -207,7 +230,7 @@ export default function SettingsScreen() {
                 <View
                   style={[
                     styles.iconBox,
-                    { backgroundColor: colors.purple + '21' },
+                    { backgroundColor: colors.purple + '22' },
                   ]}
                 >
                   <Text style={styles.iconEmoji}>{mode.icon}</Text>
@@ -229,14 +252,14 @@ export default function SettingsScreen() {
         <SectionCard header={'\u30c7\u30fc\u30bf'}>
           <TableRow
             icon={'\u2601\ufe0f'}
-            iconBg={colors.cyan + '21'}
+            iconBg={colors.cyan + '22'}
             title={'\u30af\u30e9\u30a6\u30c9\u540c\u671f'}
             right={'\u6709\u52b9'}
             rightColor={colors.green}
           />
           <TableRow
             icon={'\ud83d\udce4'}
-            iconBg={colors.green + '21'}
+            iconBg={colors.green + '22'}
             title={'\u30c7\u30fc\u30bf\u30a8\u30af\u30b9\u30dd\u30fc\u30c8'}
             right={'\u5c06\u6765\u5b9f\u88c5'}
             rightColor={colors.t3}
@@ -248,25 +271,25 @@ export default function SettingsScreen() {
         <SectionCard header={'\u30b5\u30dd\u30fc\u30c8'}>
           <TableRow
             icon={'\ud83d\udcc4'}
-            iconBg={colors.bg3}
+            iconBg={colors.t3 + '22'}
             title={'\u30d7\u30e9\u30a4\u30d0\u30b7\u30fc\u30dd\u30ea\u30b7\u30fc'}
             onPress={() => {}}
           />
           <TableRow
             icon={'\ud83d\udccb'}
-            iconBg={colors.bg3}
+            iconBg={colors.t3 + '22'}
             title={'\u5229\u7528\u898f\u7d04'}
             onPress={() => {}}
           />
           <TableRow
             icon={'\ud83d\udcac'}
-            iconBg={colors.blue + '21'}
+            iconBg={colors.blue + '22'}
             title={'\u304a\u554f\u3044\u5408\u308f\u305b'}
             onPress={() => {}}
           />
           <TableRow
             icon={'\u2139\ufe0f'}
-            iconBg={colors.bg3}
+            iconBg={colors.t3 + '22'}
             title={'\u30d0\u30fc\u30b8\u30e7\u30f3'}
             right="1.0.0"
             rightColor={colors.t3}
@@ -309,8 +332,9 @@ const styles = StyleSheet.create({
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    minHeight: 44,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minHeight: 60,
   },
   avatarCircle: {
     width: 50,
@@ -319,41 +343,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    marginRight: 12,
-  },
-  avatarOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    marginRight: 14,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
   },
   avatarInitial: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#FFFFFF',
-    zIndex: 1,
   },
   profileCenter: {
     flex: 1,
   },
   profileName: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   profileEmail: {
     fontSize: 13,
     marginTop: 2,
   },
-  planBadge: {
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginLeft: 8,
+  planSection: {
+    marginRight: 6,
+    alignItems: 'flex-end',
   },
-  planBadgeText: {
+  planText: {
     fontSize: 13,
-  },
-  chevron: {
-    fontSize: 20,
-    fontWeight: '300',
-    marginLeft: 4,
   },
   proCardOuter: {
     marginHorizontal: 16,
@@ -365,6 +383,11 @@ const styles = StyleSheet.create({
     padding: 18,
     overflow: 'hidden',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    elevation: 2,
   },
   proDecor: {
     position: 'absolute',
@@ -376,41 +399,54 @@ const styles = StyleSheet.create({
   },
   proTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     marginBottom: 6,
   },
   proDesc: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 20.8,
     marginBottom: 16,
   },
   proPriceRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
   priceBtn: {
     flex: 1,
     borderRadius: 12,
-    paddingVertical: 12,
+    padding: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 44,
+    minHeight: 48,
   },
   priceBtnText: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '600',
+  },
+  priceBtnAnnualWrap: {
+    flex: 1,
   },
   priceBtnAnnual: {
-    backgroundColor: '#007AFF',
+    flex: 1,
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 4,
   },
   priceBtnAnnualText: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   priceBtnAnnualSub: {
     fontSize: 11,
-    color: '#FFFFFFCC',
+    color: 'rgba(255,255,255,0.7)',
     marginTop: 2,
   },
   appearanceRow: {
@@ -421,9 +457,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   iconBox: {
-    width: spacing.rowIconSize,
-    height: spacing.rowIconSize,
-    borderRadius: radius.icon,
+    width: 30,
+    height: 30,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -446,13 +482,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   logoutText: {
-    fontSize: fontSize.body,
-    fontWeight: '500',
+    fontSize: 17,
   },
   footer: {
     fontSize: 13,
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 16,
+    paddingTop: 8,
+    paddingBottom: 20,
   },
 });

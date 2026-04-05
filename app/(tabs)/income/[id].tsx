@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { fontSize, spacing } from '@/theme/tokens';
 import { NavBar } from '@/components/ui/NavBar';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
@@ -58,8 +58,12 @@ export default function IncomeDetailScreen() {
             style={[
               styles.heroIcon,
               {
-                backgroundColor: colors.green + '14',
-                shadowColor: colors.heroShadow,
+                backgroundColor: `${colors.green}15`,
+                shadowColor: colors.green,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.13,
+                shadowRadius: 12,
+                elevation: 4,
               },
             ]}
           >
@@ -71,57 +75,50 @@ export default function IncomeDetailScreen() {
           </Text>
           {isUSD && (
             <Text style={[styles.heroSub, { color: colors.t2 }]}>
-              ≒ ¥{jpyAmt.toLocaleString()} (@{rate})
+              ≒ ¥{jpyAmt.toLocaleString()}{' '}
+              <Text style={{ fontSize: 11, color: colors.t2 }}>(@{rate})</Text>
             </Text>
           )}
         </View>
 
         {/* Properties */}
         <SectionCard header="プロパティ">
-          <TableRow icon="🏦" title="受取方法" right={item.method} />
-          <TableRow icon="🏷" title="カテゴリ" right={item.tag} />
-          <TableRow icon="📅" title="日付" right={item.date} />
-          <TableRow
-            icon="💱"
-            title="通貨"
-            right={item.currency}
-            last={!isUSD}
-          />
-          {isUSD && (
-            <>
-              <TableRow
-                icon="📊"
-                title="適用レート"
-                right={`¥${rate} / USD`}
-              />
-              <TableRow
-                icon="💴"
-                title="円換算額"
-                right={`¥${jpyAmt.toLocaleString()}`}
-                rightColor={colors.green}
-                last
-              />
-            </>
-          )}
+          {[
+            ['受取方法', item.method],
+            ['カテゴリ', item.tag],
+            ['日付', item.date],
+            ['通貨', item.currency],
+            ...(isUSD
+              ? [
+                  ['適用レート', `¥${rate} / USD`],
+                  ['円換算額', `¥${jpyAmt.toLocaleString()}`],
+                ]
+              : []),
+          ].map(([label, value], i, arr) => (
+            <TableRow
+              key={i}
+              title={label}
+              right={value}
+              rightColor={label === '円換算額' ? colors.green : colors.t2}
+              last={i === arr.length - 1}
+            />
+          ))}
         </SectionCard>
 
         {/* Actions */}
-        <SectionCard header="アクション">
-          <TableRow
-            icon="📋"
-            title="複製"
-            iconBg={colors.blue + '21'}
-            rightColor={colors.blue}
-            onPress={() => {}}
-          />
-          <TableRow
-            icon="🗑"
-            title="削除"
-            iconBg={colors.red + '14'}
-            rightColor={colors.red}
-            last
-            onPress={() => {}}
-          />
+        <SectionCard header="アクション" footer="オブジェクトを選択してからアクションを実行">
+          {[
+            ['複製', colors.blue],
+            ['削除', colors.red],
+          ].map(([label, color], i) => (
+            <TableRow
+              key={i}
+              title={label as string}
+              rightColor={color as string}
+              last={i === 1}
+              onPress={() => {}}
+            />
+          ))}
         </SectionCard>
       </ScrollView>
     </SafeAreaView>
@@ -142,7 +139,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    paddingVertical: 28,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
   heroIcon: {
     width: 72,
@@ -150,11 +148,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 4,
   },
   heroEmoji: {
     fontSize: 36,
@@ -162,11 +155,12 @@ const styles = StyleSheet.create({
   heroName: {
     fontSize: 22,
     fontWeight: '600',
-    marginBottom: 4,
+    marginTop: 12,
   },
   heroAmount: {
-    fontSize: fontSize.detailAmount,
+    fontSize: 36,
     fontWeight: '500',
+    marginTop: 8,
   },
   heroSub: {
     fontSize: 15,

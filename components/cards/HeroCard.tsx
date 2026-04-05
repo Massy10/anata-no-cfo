@@ -16,7 +16,7 @@ type Props = {
 };
 
 export function HeroCard({ children, variant = 'positive' }: Props) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const accentColor = variant === 'positive' ? colors.green : colors.red;
 
   const inner = (
@@ -41,13 +41,18 @@ export function HeroCard({ children, variant = 'positive' }: Props) {
     styles.container,
     {
       borderColor: colors.heroBorder as string,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.2 : 0.04,
+      shadowRadius: 10,
+      elevation: 2,
     },
   ];
 
   if (BlurView && Platform.OS === 'ios') {
     return (
       <View style={containerStyle}>
-        <BlurView intensity={12} tint="default" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={12} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
         <View style={styles.contentWrap}>{inner}</View>
       </View>
     );
@@ -70,6 +75,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     overflow: 'hidden',
     position: 'relative',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 20,
+    elevation: 2,
   },
   contentWrap: {
     padding: 20,

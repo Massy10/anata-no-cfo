@@ -14,7 +14,6 @@ import { LargeTitle } from '@/components/ui/LargeTitle';
 import { HeroCard } from '@/components/cards/HeroCard';
 import { SummaryCard } from '@/components/cards/SummaryCard';
 import { SectionCard } from '@/components/ui/SectionCard';
-import { TableRow } from '@/components/ui/TableRow';
 import { ChartBars } from '@/components/ui/ChartBars';
 import { Legend } from '@/components/ui/Legend';
 import { CfoEntryCard } from '@/components/cards/CfoEntryCard';
@@ -26,6 +25,7 @@ import {
   forecastChartData,
 } from '@/constants/mockData';
 import { useAuth } from '@/contexts/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function AnalysisScreen() {
   const { colors } = useTheme();
@@ -177,21 +177,21 @@ export default function AnalysisScreen() {
                 <ChartBars
                   data={forecastChartData.slice(2, 6)}
                   dashed
-                  barWidth={24}
+                  barWidth={16}
                 />
               </View>
-              <View
-                style={[
-                  styles.fadedOverlay,
-                  { backgroundColor: colors.bg + 'CC' },
-                ]}
+              <LinearGradient
+                colors={['transparent', colors.bg]}
+                start={{ x: 0.1, y: 0.5 }}
+                end={{ x: 0.85, y: 0.5 }}
+                style={styles.fadedOverlay}
               >
                 <View
                   style={[
                     styles.proBadge,
                     {
-                      backgroundColor: colors.blue + '14',
-                      borderColor: colors.blue,
+                      backgroundColor: colors.blue + '15',
+                      borderColor: colors.blue + '33',
                     },
                   ]}
                 >
@@ -199,7 +199,7 @@ export default function AnalysisScreen() {
                     Pro {'\u9650\u5b9a'}
                   </Text>
                 </View>
-              </View>
+              </LinearGradient>
             </View>
 
             {/* Summary box */}
@@ -226,7 +226,7 @@ export default function AnalysisScreen() {
 
             {/* Pro CTA */}
             <TouchableOpacity
-              style={[styles.proCta, { backgroundColor: colors.blue + '14' }]}
+              style={[styles.proCta, { backgroundColor: colors.blue + '15', borderColor: colors.blue + '33' }]}
               onPress={() => router.push('/settings')}
             >
               <Text style={[styles.proCtaText, { color: colors.blue }]}>
@@ -239,13 +239,26 @@ export default function AnalysisScreen() {
         {/* G. Payment Method Breakdown */}
         <SectionCard header={'\u652f\u6255\u624b\u6bb5\u5225\uff08\u4eca\u6708\uff09'}>
           {paymentMethods.map((pm, i) => (
-            <TableRow
+            <View
               key={pm.name}
-              icon={undefined}
-              title={pm.name}
-              right={'\u00a5' + pm.amount.toLocaleString()}
-              last={i === paymentMethods.length - 1}
-            />
+              style={[
+                styles.pmRow,
+                i < paymentMethods.length - 1 && {
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: colors.sep,
+                },
+              ]}
+            >
+              <View
+                style={[styles.pmDot, { backgroundColor: pm.color }]}
+              />
+              <Text style={[styles.pmTitle, { color: colors.t1 }]}>
+                {pm.name}
+              </Text>
+              <Text style={[styles.pmRight, { color: colors.t2 }]}>
+                {'\u00a5' + pm.amount.toLocaleString()}
+              </Text>
+            </View>
           ))}
         </SectionCard>
       </ScrollView>
@@ -267,12 +280,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
     letterSpacing: 0.5,
-    marginBottom: 4,
   },
   heroAmount: {
     fontSize: 40,
     fontWeight: '600',
     letterSpacing: -0.5,
+    marginTop: 6,
   },
   subCardsRow: {
     flexDirection: 'row',
@@ -287,50 +300,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 44,
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 12,
+    paddingHorizontal: 16,
   },
   toggleText: {
     fontSize: 13,
   },
   fadedContainer: {
-    marginTop: 12,
+    marginTop: 8,
     position: 'relative',
   },
   fadedBars: {
     opacity: 0.25,
   },
   fadedOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
+    justifyContent: 'flex-end',
+    paddingRight: 12,
   },
   proBadge: {
     borderWidth: 0.5,
-    borderRadius: 8,
+    borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   proBadgeText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   summaryBox: {
     borderRadius: 8,
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     marginTop: 12,
   },
   summaryLabel: {
     fontSize: 11,
-    marginBottom: 2,
   },
   summaryAmount: {
     fontSize: 22,
     fontWeight: '300',
-    marginBottom: 4,
+    marginTop: 2,
   },
   summaryWarning: {
     fontSize: 11,
+    marginTop: 4,
   },
   proCta: {
     borderRadius: 10,
@@ -338,9 +358,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 12,
+    padding: 14,
+    borderWidth: 0.5,
   },
   proCtaText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
+  },
+  pmRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 44,
+    paddingHorizontal: 16,
+  },
+  pmDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 3,
+    marginRight: 12,
+  },
+  pmTitle: {
+    fontSize: 17,
+    flex: 1,
+  },
+  pmRight: {
+    fontSize: 17,
+    marginLeft: 8,
   },
 });

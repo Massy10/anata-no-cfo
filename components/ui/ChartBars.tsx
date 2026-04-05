@@ -17,7 +17,7 @@ type Props = {
 
 const MAX_BAR_HEIGHT = 100;
 
-export function ChartBars({ data, dashed = false, count, barWidth = 12 }: Props) {
+export function ChartBars({ data, dashed = false, count, barWidth = 16 }: Props) {
   const { colors } = useTheme();
   const displayData = count != null ? data.slice(0, count) : data;
 
@@ -29,10 +29,9 @@ export function ChartBars({ data, dashed = false, count, barWidth = 12 }: Props)
   const barHeight = (val: number) =>
     Math.max((val / maxVal) * MAX_BAR_HEIGHT, 2);
 
-  const formatMan = (val: number) => {
-    const man = val / 10000;
-    if (man >= 10) return Math.round(man) + '万';
-    return man.toFixed(1) + '万';
+  const formatNet = (val: number) => {
+    const prefix = val >= 0 ? '+' : '';
+    return prefix + Math.round(val / 10000) + '万';
   };
 
   return (
@@ -44,8 +43,7 @@ export function ChartBars({ data, dashed = false, count, barWidth = 12 }: Props)
         return (
           <View key={i} style={styles.column}>
             <Text style={[styles.netLabel, { color: netColor }]}>
-              {net >= 0 ? '+' : ''}
-              {formatMan(net)}
+              {formatNet(net)}
             </Text>
             <View style={styles.barPair}>
               <View
@@ -54,11 +52,15 @@ export function ChartBars({ data, dashed = false, count, barWidth = 12 }: Props)
                   {
                     width: barWidth,
                     height: barHeight(d.inc),
-                    backgroundColor: colors.blue,
-                    opacity: dashed ? 0.4 : 1,
-                    borderRadius: 3,
+                    backgroundColor: dashed ? colors.blue + '44' : colors.blue,
+                    borderTopLeftRadius: 5,
+                    borderTopRightRadius: 5,
                   },
-                  dashed && styles.dashedBar,
+                  dashed && {
+                    borderWidth: 1,
+                    borderStyle: 'dashed' as const,
+                    borderColor: colors.blue + '88',
+                  },
                 ]}
               />
               <View
@@ -67,11 +69,15 @@ export function ChartBars({ data, dashed = false, count, barWidth = 12 }: Props)
                   {
                     width: barWidth,
                     height: barHeight(d.exp),
-                    backgroundColor: colors.red,
-                    opacity: dashed ? 0.4 : 1,
-                    borderRadius: 3,
+                    backgroundColor: dashed ? colors.red + '33' : colors.red + 'DD',
+                    borderTopLeftRadius: 5,
+                    borderTopRightRadius: 5,
                   },
-                  dashed && styles.dashedBar,
+                  dashed && {
+                    borderWidth: 1,
+                    borderStyle: 'dashed' as const,
+                    borderColor: colors.red + '66',
+                  },
                 ]}
               />
             </View>
@@ -100,19 +106,16 @@ const styles = StyleSheet.create({
   netLabel: {
     fontSize: 10,
     fontWeight: '500',
-    marginBottom: 2,
+    marginBottom: 3,
   },
   barPair: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 2,
+    height: 100,
   },
   bar: {
     minHeight: 2,
-  },
-  dashedBar: {
-    borderWidth: 1,
-    borderStyle: 'dashed',
   },
   monthLabel: {
     fontSize: 10,

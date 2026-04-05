@@ -9,16 +9,15 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import { NavBar } from '@/components/ui/NavBar';
 import { SectionCard } from '@/components/ui/SectionCard';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
   const { colors } = useTheme();
@@ -34,7 +33,7 @@ export default function OnboardingScreen() {
   if (step === 0) {
     return (
       <SafeAreaView style={[styles.flex, { backgroundColor: colors.bg }]}>
-        <View style={styles.flex}>
+        <View style={[styles.flex, styles.step0Container]}>
           {/* Decorative bubbles */}
           <View
             style={[
@@ -43,9 +42,8 @@ export default function OnboardingScreen() {
                 width: 120,
                 height: 120,
                 borderRadius: 60,
-                backgroundColor: colors.blue,
-                opacity: 0.08,
-                top: 60,
+                backgroundColor: `${colors.blue}14`,
+                top: 40,
                 left: -20,
               },
             ]}
@@ -57,10 +55,9 @@ export default function OnboardingScreen() {
                 width: 80,
                 height: 80,
                 borderRadius: 40,
-                backgroundColor: colors.purple,
-                opacity: 0.06,
-                top: 40,
-                right: -10,
+                backgroundColor: `${colors.purple}0F`,
+                top: 120,
+                right: -30,
               },
             ]}
           />
@@ -71,10 +68,9 @@ export default function OnboardingScreen() {
                 width: 60,
                 height: 60,
                 borderRadius: 30,
-                backgroundColor: colors.green,
-                opacity: 0.06,
-                bottom: 180,
-                left: 20,
+                backgroundColor: `${colors.green}0F`,
+                bottom: 100,
+                left: 30,
               },
             ]}
           />
@@ -85,43 +81,66 @@ export default function OnboardingScreen() {
                 width: 100,
                 height: 100,
                 borderRadius: 50,
-                backgroundColor: colors.blue,
-                opacity: 0.05,
-                bottom: 120,
-                right: -20,
+                backgroundColor: `${colors.blue}0D`,
+                bottom: 60,
+                right: 20,
               },
             ]}
           />
 
-          <View style={styles.centerContent}>
+          <View style={styles.step0Content}>
             {/* App icon */}
-            <View style={styles.appIconWrapper}>
-              <View style={[styles.appIcon, { backgroundColor: colors.blue }]}>
-                <Text style={styles.appIconEmoji}>💰</Text>
-              </View>
-            </View>
+            <LinearGradient
+              colors={[colors.blue, colors.purple]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[
+                styles.step0Icon,
+                {
+                  shadowColor: colors.blue,
+                  shadowOffset: { width: 0, height: 16 },
+                  shadowOpacity: 0.27,
+                  shadowRadius: 24,
+                  elevation: 10,
+                },
+              ]}
+            >
+              <Text style={{ fontSize: 44 }}>💰</Text>
+            </LinearGradient>
 
             <Text style={[styles.welcomeTitle, { color: colors.t1 }]}>
               ようこそ
             </Text>
             <Text style={[styles.welcomeSubtitle, { color: colors.t2 }]}>
-              あなたのCFO は、あなた専用の最高財務責任者です
+              {'あなたのCFO は、あなた専用の\n最高財務責任者です'}
             </Text>
             <Text style={[styles.welcomeDesc, { color: colors.t2 }]}>
-              収支データを分析し、利益向上や支出削減の提案をしてくれます
+              {'収支データを分析し、利益向上や\n支出削減の提案をしてくれます'}
             </Text>
-          </View>
 
-          <View style={styles.bottomButton}>
-            <TouchableOpacity
-              style={styles.gradientButton}
-              activeOpacity={0.8}
-              onPress={() => setStep(1)}
+            <LinearGradient
+              colors={[colors.blue, colors.purple]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[
+                styles.step0Button,
+                {
+                  shadowColor: colors.blue,
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 12,
+                  elevation: 6,
+                },
+              ]}
             >
-              <View style={[styles.gradientBg, { backgroundColor: colors.blue }]}>
-                <Text style={styles.gradientButtonText}>はじめる</Text>
-              </View>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.step0ButtonInner}
+                activeOpacity={0.8}
+                onPress={() => setStep(1)}
+              >
+                <Text style={styles.step0ButtonText}>はじめる</Text>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </View>
       </SafeAreaView>
@@ -145,9 +164,14 @@ export default function OnboardingScreen() {
           >
             {/* Brain icon */}
             <View style={styles.iconCircleWrapper}>
-              <View style={[styles.iconCircle, { backgroundColor: colors.purple }]}>
-                <Text style={styles.iconCircleEmoji}>🧠</Text>
-              </View>
+              <LinearGradient
+                colors={[colors.blue, colors.purple]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.iconCircle}
+              >
+                <Text style={{ fontSize: 32 }}>🧠</Text>
+              </LinearGradient>
             </View>
 
             <Text style={[styles.setupHint, { color: colors.t2 }]}>
@@ -155,64 +179,62 @@ export default function OnboardingScreen() {
             </Text>
 
             <SectionCard header="CFOの名前" footer="いつでも設定から変更できます">
-              <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    color: colors.t1,
-                    backgroundColor: colors.bg2,
-                  },
-                ]}
-                value={cfoName}
-                onChangeText={setCfoName}
-                placeholder="CFOの名前"
-                placeholderTextColor={colors.t3}
-              />
+              <View style={{ padding: 12, paddingHorizontal: 16 }}>
+                <TextInput
+                  style={[styles.textInput, { color: colors.t1 }]}
+                  value={cfoName}
+                  onChangeText={setCfoName}
+                  placeholder="例: マネーの番人"
+                  placeholderTextColor={colors.t3}
+                />
+              </View>
             </SectionCard>
 
             <SectionCard header="目標設定" footer="CFOがこの目標に基づいてアドバイスします">
-              <View style={[styles.goalRow, { borderBottomColor: colors.sep }]}>
-                <Text style={[styles.goalLabel, { color: colors.t1 }]}>
-                  目標総資産
-                </Text>
-                <View style={styles.goalInputRow}>
-                  <TextInput
-                    style={[
-                      styles.goalInput,
-                      {
-                        color: colors.t1,
-                        backgroundColor: colors.bg3,
-                      },
-                    ]}
-                    value={goalAsset}
-                    onChangeText={setGoalAsset}
-                    keyboardType="numeric"
-                    placeholder="1000"
-                    placeholderTextColor={colors.t3}
-                  />
-                  <Text style={[styles.goalUnit, { color: colors.t2 }]}>万円</Text>
+              <View style={{ paddingHorizontal: 16 }}>
+                <View
+                  style={[
+                    styles.goalRow,
+                    {
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                      borderBottomColor: colors.sep,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.goalLabel, { color: colors.t1 }]}>
+                    目標総資産
+                  </Text>
+                  <View style={styles.goalInputRow}>
+                    <TextInput
+                      style={[styles.goalInput, { color: colors.blue }]}
+                      value={goalAsset}
+                      onChangeText={setGoalAsset}
+                      keyboardType="numeric"
+                      placeholder="1000"
+                      placeholderTextColor={colors.t3}
+                    />
+                    <Text style={[styles.goalUnit, { color: colors.t1 }]}>
+                      万円
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.goalRow}>
-                <Text style={[styles.goalLabel, { color: colors.t1 }]}>
-                  月間目標CF
-                </Text>
-                <View style={styles.goalInputRow}>
-                  <TextInput
-                    style={[
-                      styles.goalInput,
-                      {
-                        color: colors.t1,
-                        backgroundColor: colors.bg3,
-                      },
-                    ]}
-                    value={goalCf}
-                    onChangeText={setGoalCf}
-                    keyboardType="numeric"
-                    placeholder="10"
-                    placeholderTextColor={colors.t3}
-                  />
-                  <Text style={[styles.goalUnit, { color: colors.t2 }]}>万円</Text>
+                <View style={styles.goalRow}>
+                  <Text style={[styles.goalLabel, { color: colors.t1 }]}>
+                    月間目標CF
+                  </Text>
+                  <View style={styles.goalInputRow}>
+                    <TextInput
+                      style={[styles.goalInput, { color: colors.green }]}
+                      value={goalCf}
+                      onChangeText={setGoalCf}
+                      keyboardType="numeric"
+                      placeholder="10"
+                      placeholderTextColor={colors.t3}
+                    />
+                    <Text style={[styles.goalUnit, { color: colors.t1 }]}>
+                      万円
+                    </Text>
+                  </View>
                 </View>
               </View>
             </SectionCard>
@@ -243,10 +265,19 @@ export default function OnboardingScreen() {
         <View
           style={[
             styles.checkCircle,
-            { backgroundColor: colors.green },
+            { backgroundColor: `${colors.green}22` },
           ]}
         >
-          <Text style={styles.checkEmoji}>✓</Text>
+          <Svg width={40} height={40} viewBox="0 0 40 40">
+            <Path
+              d="M10 20L17 27L30 13"
+              stroke={colors.green}
+              strokeWidth={3.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </Svg>
         </View>
 
         <Text style={[styles.confirmTitle, { color: colors.t1 }]}>
@@ -254,72 +285,77 @@ export default function OnboardingScreen() {
         </Text>
 
         {/* CFO name card */}
-        <View
-          style={[
-            styles.cfoNameCard,
-            { backgroundColor: colors.bg2, borderColor: colors.heroBorder },
-          ]}
+        <LinearGradient
+          colors={[`${colors.blue}15`, `${colors.purple}15`]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.cfoNameCard}
         >
-          <Text style={[styles.cfoNameText, { color: colors.t1 }]}>
-            「{cfoName || 'マネーの番人'}」
+          <Text style={[{ fontSize: 13, color: colors.t2 }]}>
+            あなたのCFO
           </Text>
-        </View>
-
-        {/* Summary cards */}
-        <View style={styles.summaryRow}>
-          <View
+          <Text
             style={[
-              styles.summaryCard,
-              { backgroundColor: colors.bg2 },
+              { fontSize: 22, fontWeight: '700', color: colors.t1, marginTop: 4 },
             ]}
           >
-            <View style={[styles.summaryDot, { backgroundColor: colors.blue }]} />
-            <Text style={[styles.summaryLabel, { color: colors.t2 }]}>
+            「{cfoName || 'マネーの番人'}」
+          </Text>
+        </LinearGradient>
+
+        {/* Goal cards */}
+        <View style={styles.goalCardsRow}>
+          <View
+            style={[styles.goalCard, { backgroundColor: colors.bg2 }]}
+          >
+            <Text style={[{ fontSize: 11, color: colors.t2 }]}>
               目標総資産
             </Text>
-            <Text style={[styles.summaryValue, { color: colors.t1 }]}>
-              {goalAsset || '1000'}万円
+            <Text
+              style={[
+                { fontSize: 20, fontWeight: '600', color: colors.blue, marginTop: 2 },
+              ]}
+            >
+              {goalAsset || '1000'}
+              <Text style={{ fontSize: 13, fontWeight: '400' }}>万円</Text>
             </Text>
           </View>
           <View
-            style={[
-              styles.summaryCard,
-              { backgroundColor: colors.bg2 },
-            ]}
+            style={[styles.goalCard, { backgroundColor: colors.bg2 }]}
           >
-            <View style={[styles.summaryDot, { backgroundColor: colors.green }]} />
-            <Text style={[styles.summaryLabel, { color: colors.t2 }]}>
+            <Text style={[{ fontSize: 11, color: colors.t2 }]}>
               月間目標CF
             </Text>
-            <Text style={[styles.summaryValue, { color: colors.t1 }]}>
-              {goalCf || '10'}万円
+            <Text
+              style={[
+                { fontSize: 20, fontWeight: '600', color: colors.green, marginTop: 2 },
+              ]}
+            >
+              +{goalCf || '10'}
+              <Text style={{ fontSize: 13, fontWeight: '400' }}>万円</Text>
             </Text>
           </View>
         </View>
 
         <Text style={[styles.confirmHint, { color: colors.t3 }]}>
-          分析タブから「{cfoName || 'マネーの番人'}」にいつでも相談できます
+          {'分析タブから「' + (cfoName || 'マネーの番人') + '」に\nいつでも相談できます'}
         </Text>
 
-        <View style={styles.nextButtonWrapper}>
-          <TouchableOpacity
-            style={[styles.gradientButton, { overflow: 'hidden' }]}
-            activeOpacity={0.8}
-            onPress={() => {
-              setCfoProfile({
-                cfoName: cfoName || 'マネーの番人',
-                goalAsset: Number(goalAsset) || 1000,
-                goalCf: Number(goalCf) || 10,
-              });
-              setIsOnboarded(true);
-              router.replace('/login');
-            }}
-          >
-            <View style={[styles.gradientBg, { backgroundColor: colors.blue }]}>
-              <Text style={styles.gradientButtonText}>はじめましょう</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.completeButton, { backgroundColor: colors.blue }]}
+          activeOpacity={0.8}
+          onPress={() => {
+            setCfoProfile({
+              cfoName: cfoName || 'マネーの番人',
+              goalAsset: Number(goalAsset) || 1000,
+              goalCf: Number(goalCf) || 10,
+            });
+            setIsOnboarded(true);
+            router.replace('/login');
+          }}
+        >
+          <Text style={styles.completeButtonText}>はじめましょう</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -332,63 +368,61 @@ const styles = StyleSheet.create({
   bubble: {
     position: 'absolute',
   },
-  centerContent: {
+  // Step 0
+  step0Container: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  step0Content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 28,
   },
-  appIconWrapper: {
-    marginBottom: 24,
-  },
-  appIcon: {
+  step0Icon: {
     width: 88,
     height: 88,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  appIconEmoji: {
-    fontSize: 40,
+    marginBottom: 28,
   },
   welcomeTitle: {
     fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 12,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    marginBottom: 8,
     textAlign: 'center',
   },
   welcomeSubtitle: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 8,
-    lineHeight: 24,
+    lineHeight: 27.2,
   },
   welcomeDesc: {
     fontSize: 13,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 20.8,
+    marginBottom: 44,
   },
-  bottomButton: {
-    paddingHorizontal: spacing.screenPaddingH,
-    paddingBottom: 32,
-  },
-  gradientButton: {
+  step0Button: {
     width: '100%',
     borderRadius: 14,
     overflow: 'hidden',
   },
-  gradientBg: {
-    paddingVertical: 16,
+  step0ButtonInner: {
+    padding: 16,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    minHeight: 52,
   },
-  gradientButtonText: {
+  step0ButtonText: {
     color: '#FFFFFF',
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
+  // Step 1
   scrollContent: {
     paddingTop: 24,
     paddingBottom: 40,
@@ -404,68 +438,63 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconCircleEmoji: {
-    fontSize: 30,
-  },
   setupHint: {
     fontSize: 13,
     textAlign: 'center',
     marginBottom: 24,
   },
   textInput: {
-    fontSize: fontSize.body,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: spacing.rowMinHeight,
+    fontSize: 17,
+    backgroundColor: 'transparent',
   },
   goalRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    minHeight: spacing.rowMinHeight,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 12,
   },
   goalLabel: {
-    fontSize: fontSize.body,
+    fontSize: 15,
     flex: 1,
   },
   goalInputRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    gap: 2,
   },
   goalInput: {
-    fontSize: fontSize.body,
+    width: 60,
+    fontSize: 17,
+    fontWeight: '600',
     textAlign: 'right',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    minWidth: 80,
-    marginRight: 4,
+    backgroundColor: 'transparent',
   },
   goalUnit: {
-    fontSize: fontSize.body,
+    fontSize: 15,
+    fontWeight: '500',
   },
   nextButtonWrapper: {
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 16,
     paddingTop: 16,
   },
   nextButton: {
     borderRadius: 12,
-    paddingVertical: 14,
+    padding: 16,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 48,
   },
   nextButtonText: {
     color: '#FFFFFF',
-    fontSize: fontSize.body,
+    fontSize: 17,
     fontWeight: '600',
   },
+  // Step 2
   confirmContent: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: 60,
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 28,
     paddingBottom: 40,
   },
   checkCircle: {
@@ -476,59 +505,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  checkEmoji: {
-    fontSize: 36,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
   confirmTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 24,
-  },
-  cfoNameCard: {
-    paddingVertical: 20,
-    paddingHorizontal: 32,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    marginBottom: 24,
-    width: '100%',
-    alignItems: 'center',
-  },
-  cfoNameText: {
-    fontSize: 22,
-    fontWeight: '600',
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-    width: '100%',
-  },
-  summaryCard: {
-    flex: 1,
-    borderRadius: radius.card,
-    padding: 16,
-    alignItems: 'center',
-  },
-  summaryDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    fontWeight: '700',
     marginBottom: 8,
   },
-  summaryLabel: {
-    fontSize: fontSize.caption,
-    marginBottom: 4,
+  cfoNameCard: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    alignItems: 'center',
   },
-  summaryValue: {
-    fontSize: fontSize.body,
-    fontWeight: '600',
+  goalCardsRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 32,
+  },
+  goalCard: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
   },
   confirmHint: {
     fontSize: 13,
     textAlign: 'center',
+    lineHeight: 20.8,
     marginBottom: 32,
-    lineHeight: 20,
+  },
+  completeButton: {
+    width: '100%',
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  completeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '600',
   },
 });

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import { NavBar } from '@/components/ui/NavBar';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
@@ -22,8 +22,8 @@ export default function NewIncomeScreen() {
   const [amount, setAmount] = useState('0');
 
   const numAmount = parseFloat(amount) || 0;
-  const rate = getRate();
-  const jpyAmt = currency === 'USD' ? toJPY(numAmount, 'USD') : numAmount;
+  const rate = getRate('4月4日');
+  const jpyAmt = currency === 'USD' ? Math.round(numAmount * rate) : numAmount;
   const sym = currency === 'USD' ? '$' : '¥';
 
   return (
@@ -44,83 +44,69 @@ export default function NewIncomeScreen() {
             金額をタップして入力
           </Text>
           <Text style={[styles.amountDisplay, { color: colors.green }]}>
-            {sym}{numAmount > 0 ? numAmount.toLocaleString() : '0'}
+            {sym}{numAmount.toLocaleString()}
           </Text>
           {currency === 'USD' && numAmount > 0 && (
             <Text style={[styles.conversionPreview, { color: colors.t2 }]}>
-              ≒ ¥{jpyAmt.toLocaleString()} (@{rate})
+              ≒ ¥{jpyAmt.toLocaleString()}{' '}
+              <Text style={{ fontSize: 11, color: colors.t3 }}>(@{rate})</Text>
             </Text>
           )}
         </View>
 
         {/* Currency toggle */}
         <View style={styles.currencyRow}>
-          <TouchableOpacity
-            style={[
-              styles.currencyPill,
-              {
-                backgroundColor:
-                  currency === 'JPY' ? colors.blue + '21' : 'transparent',
-                borderColor: currency === 'JPY' ? colors.blue : colors.sep,
-              },
-            ]}
-            onPress={() => setCurrency('JPY')}
-          >
-            <Text
-              style={[
-                styles.currencyText,
-                { color: currency === 'JPY' ? colors.blue : colors.t2 },
-              ]}
-            >
-              🇯🇵 JPY
-            </Text>
-          </TouchableOpacity>
-
-          <View style={{ width: 8 }} />
-
-          <TouchableOpacity
-            style={[
-              styles.currencyPill,
-              {
-                backgroundColor:
-                  currency === 'USD' ? colors.blue + '21' : 'transparent',
-                borderColor: currency === 'USD' ? colors.blue : colors.sep,
-              },
-            ]}
-            onPress={() => setCurrency('USD')}
-          >
-            <Text
-              style={[
-                styles.currencyText,
-                { color: currency === 'USD' ? colors.blue : colors.t2 },
-              ]}
-            >
-              🇺🇸 USD
-            </Text>
-          </TouchableOpacity>
+          {(['JPY', 'USD'] as const).map((v) => {
+            const active = currency === v;
+            return (
+              <TouchableOpacity
+                key={v}
+                style={[
+                  styles.currencyPill,
+                  {
+                    backgroundColor: active ? `${colors.blue}22` : 'transparent',
+                    borderColor: active ? `${colors.blue}44` : colors.sep,
+                    borderWidth: 0.5,
+                  },
+                ]}
+                onPress={() => setCurrency(v)}
+              >
+                <Text
+                  style={[
+                    styles.currencyText,
+                    {
+                      color: active ? colors.blue : colors.t3,
+                      fontWeight: active ? '600' : '400',
+                    },
+                  ]}
+                >
+                  {v === 'JPY' ? '🇯🇵 JPY' : '🇺🇸 USD'}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Form fields */}
         <SectionCard>
-          <TableRow icon="🏦" title="受取方法" right="銀行振込" onPress={() => {}} />
-          <TableRow icon="💼" title="カテゴリ" right="副業収入" onPress={() => {}} />
-          <TableRow icon="📅" title="日付" right="2026年4月4日" onPress={() => {}} />
-          {currency === 'USD' && (
+          {[
+            { l: '受取方法', v: '🏦 銀行振込' },
+            { l: 'カテゴリ', v: '💼 副業収入' },
+            { l: '日付', v: '2026年4月4日' },
+            ...(currency === 'USD'
+              ? [{ l: '適用レート', v: `¥${rate} / USD（自動取得）` }]
+              : []),
+            { l: 'メモ', v: 'タップして入力' },
+          ].map((f, i, arr) => (
             <TableRow
-              icon="📊"
-              title="適用レート"
-              right={`¥${rate} / USD（自動取得）`}
-              rightColor={colors.purple}
+              key={i}
+              title={f.l}
+              right={f.v}
+              rightColor={f.l === '適用レート' ? colors.purple : colors.t2}
+              last={i === arr.length - 1}
+              onPress={() => {}}
             />
-          )}
-          <TableRow
-            icon="📝"
-            title="メモ"
-            right="タップして入力"
-            rightColor={colors.t3}
-            last
-            onPress={() => {}}
-          />
+          ))}
         </SectionCard>
 
         {/* USD info banner */}
@@ -129,14 +115,13 @@ export default function NewIncomeScreen() {
             style={[
               styles.infoBanner,
               {
-                backgroundColor: colors.purple + '12',
-                borderColor: colors.purple + '33',
+                backgroundColor: `${colors.purple}11`,
+                borderColor: `${colors.purple}22`,
               },
             ]}
           >
             <Text style={[styles.infoBannerText, { color: colors.purple }]}>
-              💱 為替レートは入力日の市場レートを自動取得します。
-              手動で変更することも可能です。
+              為替レートは入力日のレートを自動で取得します。保存後の円換算額は ¥{jpyAmt.toLocaleString()} です。
             </Text>
           </View>
         )}
@@ -151,46 +136,46 @@ const styles = StyleSheet.create({
   },
   amountSection: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingTop: 8,
+    paddingBottom: 4,
   },
   amountHint: {
-    fontSize: fontSize.smallCaption,
-    marginBottom: 8,
+    fontSize: 11,
+    marginBottom: 4,
   },
   amountDisplay: {
-    fontSize: fontSize.inputAmount,
+    fontSize: 48,
     fontWeight: '200',
   },
   conversionPreview: {
     fontSize: 15,
-    marginTop: 6,
+    marginTop: 2,
   },
   currencyRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingHorizontal: spacing.screenPaddingH,
-    marginBottom: 20,
+    gap: 8,
+    paddingTop: 4,
+    paddingBottom: 16,
   },
   currencyPill: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    minHeight: 44,
-    justifyContent: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 18,
+    borderRadius: 8,
   },
   currencyText: {
-    fontSize: fontSize.body,
-    fontWeight: '500',
+    fontSize: 13,
   },
   infoBanner: {
-    marginHorizontal: spacing.screenPaddingH,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    padding: spacing.cardPadding,
+    marginHorizontal: 16,
+    marginTop: 0,
+    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 0.5,
   },
   infoBannerText: {
-    fontSize: fontSize.caption,
-    lineHeight: 20,
+    fontSize: 11,
   },
 });

@@ -17,6 +17,7 @@ import { NavBar } from '@/components/ui/NavBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { toJPY } from '@/lib/fx';
 import { incomeData, expenseData } from '@/constants/mockData';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Message = {
   role: 'cfo' | 'user';
@@ -131,7 +132,7 @@ export default function CfoChatScreen() {
         {/* Goal summary bar */}
         <View style={styles.goalBar}>
           <View style={[styles.goalPill, { backgroundColor: colors.bg2 }]}>
-            <Text style={[styles.goalLabel, { color: colors.t2 }]}>
+            <Text style={[styles.goalLabel, { color: colors.t3 }]}>
               {'\u76ee\u6a19\u8cc7\u7523'}
             </Text>
             <Text style={[styles.goalValue, { color: colors.blue }]}>
@@ -139,7 +140,7 @@ export default function CfoChatScreen() {
             </Text>
           </View>
           <View style={[styles.goalPill, { backgroundColor: colors.bg2 }]}>
-            <Text style={[styles.goalLabel, { color: colors.t2 }]}>
+            <Text style={[styles.goalLabel, { color: colors.t3 }]}>
               {'\u6708\u9593CF'}
             </Text>
             <Text style={[styles.goalValue, { color: colors.green }]}>
@@ -170,20 +171,14 @@ export default function CfoChatScreen() {
               >
                 {isCfo && (
                   <View style={styles.avatar}>
-                    <View
-                      style={[
-                        styles.avatarCircle,
-                        { backgroundColor: colors.blue },
-                      ]}
+                    <LinearGradient
+                      colors={[colors.blue, colors.purple]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.avatarCircle}
                     >
-                      <View
-                        style={[
-                          styles.avatarOverlay,
-                          { backgroundColor: colors.purple, opacity: 0.5 },
-                        ]}
-                      />
                       <Text style={styles.avatarEmoji}>{'\ud83e\udde0'}</Text>
-                    </View>
+                    </LinearGradient>
                   </View>
                 )}
                 <View
@@ -270,7 +265,7 @@ export default function CfoChatScreen() {
             style={[
               styles.sendBtn,
               {
-                backgroundColor: hasInput ? colors.blue : colors.blue + '55',
+                backgroundColor: hasInput ? colors.blue : colors.blue + '33',
               },
             ]}
             onPress={() => sendMessage(input)}
@@ -295,30 +290,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginBottom: 8,
   },
   goalPill: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    borderRadius: 16,
-    paddingHorizontal: 12,
+    gap: 6,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     paddingVertical: 6,
   },
   goalLabel: {
-    fontSize: 13,
+    fontSize: 11,
   },
   goalValue: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   messagesContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 8,
+    gap: 10,
   },
   msgRow: {
     flexDirection: 'row',
-    marginBottom: 12,
   },
   msgRowLeft: {
     justifyContent: 'flex-start',
@@ -328,7 +325,7 @@ const styles = StyleSheet.create({
   },
   avatar: {
     marginRight: 8,
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
   },
   avatarCircle: {
     width: 30,
@@ -342,7 +339,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   avatarEmoji: {
-    fontSize: 16,
+    fontSize: 14,
     zIndex: 1,
   },
   bubble: {
@@ -365,14 +362,15 @@ const styles = StyleSheet.create({
   },
   bubbleText: {
     fontSize: 13,
-    lineHeight: 21,
+    lineHeight: 20.8,
   },
   suggestionsBar: {
     maxHeight: 44,
   },
   suggestionsContent: {
     paddingHorizontal: 16,
-    gap: 8,
+    paddingVertical: 4,
+    gap: 6,
     alignItems: 'center',
   },
   suggestionPill: {

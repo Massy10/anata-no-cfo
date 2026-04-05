@@ -57,7 +57,7 @@ export function CfoEntryCard({
         {/* Center: title + subtitle */}
         <View style={styles.center}>
           <Text style={[styles.title, { color: colors.t1 }]}>
-            {cfoName ? `${cfoName}に相談する` : 'CFOに相談する'}
+            {'CFOに相談する'}
           </Text>
           <Text style={[styles.subtitle, { color: colors.t2 }]}>
             収支データからAIがアドバイス
@@ -65,9 +65,18 @@ export function CfoEntryCard({
         </View>
 
         {/* Right: badge */}
-        <View style={[styles.badge, { backgroundColor: colors.blue + '1F' }]}>
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: colors.blue + '12',
+              borderWidth: 0.5,
+              borderColor: colors.blue + '22',
+            },
+          ]}
+        >
           <Text style={[styles.badgeText, { color: colors.blue }]}>
-            Free {chatCount}/{chatLimit}回/月
+            Free 30回/月
           </Text>
         </View>
       </View>
@@ -130,9 +139,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 14,
   },
   iconCircle: {
-    marginRight: 12,
+    flexShrink: 0,
   },
   iconGradient: {
     width: 48,
@@ -141,6 +151,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   iconOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -156,21 +171,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   subtitle: {
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 3,
   },
   badge: {
     borderRadius: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    marginLeft: 8,
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });
 

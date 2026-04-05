@@ -7,22 +7,29 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import { LargeTitle } from '@/components/ui/LargeTitle';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { FAB } from '@/components/ui/FAB';
-import { toJPY, getRate, formatCurrency, DEFAULT_RATE } from '@/lib/fx';
+import { toJPY, getRate } from '@/lib/fx';
 import { incomeData, expenseData } from '@/constants/mockData';
 
-const FILTERS = ['すべて', '給与', '副業', '投資', 'その他'] as const;
+const FILTER_KEYS: [string, string][] = [
+  ['all', 'すべて'],
+  ['給与', '給与'],
+  ['副業', '副業'],
+  ['投資', '投資'],
+  ['その他', 'その他'],
+];
 
 export default function IncomeListScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<string>('すべて');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
 
   const hasUSD = incomeData.some((i) => i.currency === 'USD');
 
@@ -37,7 +44,7 @@ export default function IncomeListScreen() {
   const net = totalIncome - totalExpense;
 
   const filtered = useMemo(() => {
-    if (activeFilter === 'すべて') return incomeData;
+    if (activeFilter === 'all') return incomeData;
     return incomeData.filter((i) => i.tag === activeFilter);
   }, [activeFilter]);
 
@@ -51,52 +58,54 @@ export default function IncomeListScreen() {
 
       {/* Summary cards */}
       <View style={styles.summaryRow}>
+        {/* Income total card with BlurView */}
         <View
           style={[
             styles.summaryCard,
             {
-              backgroundColor: colors.heroGlass,
+              borderWidth: StyleSheet.hairlineWidth,
               borderColor: colors.heroBorder,
-              borderWidth: 1,
+              overflow: 'hidden',
             },
           ]}
         >
-          <Text style={[styles.summaryLabel, { color: colors.green }]}>
-            {hasUSD ? '収入合計 (円換算)' : '収入合計'}
-          </Text>
-          <Text style={[styles.summaryAmount, { color: colors.t1 }]}>
-            ¥{totalIncome.toLocaleString()}
-          </Text>
+          <BlurView intensity={8} style={StyleSheet.absoluteFill} />
+          <View style={[styles.summaryCardInner, { backgroundColor: colors.heroGlass }]}>
+            <Text style={[styles.summaryLabel, { color: colors.green }]}>
+              {hasUSD ? '収入合計 (円換算)' : '収入合計'}
+            </Text>
+            <Text style={[styles.summaryAmount, { color: colors.t1 }]}>
+              ¥{totalIncome.toLocaleString()}
+            </Text>
+          </View>
         </View>
 
-        <View style={{ width: spacing.cardGap }} />
+        <View style={{ width: 8 }} />
 
+        {/* Net CF card */}
         <View
           style={[
             styles.summaryCard,
             {
-              backgroundColor: net >= 0 ? colors.green + '14' : colors.red + '14',
-              borderColor: net >= 0 ? colors.green + '33' : colors.red + '33',
-              borderWidth: 1,
+              backgroundColor: net >= 0 ? `${colors.green}10` : `${colors.red}10`,
+              borderWidth: 0.5,
+              borderColor: net >= 0 ? `${colors.green}22` : `${colors.red}22`,
             },
           ]}
         >
-          <Text
-            style={[
-              styles.summaryLabel,
-              { color: net >= 0 ? colors.green : colors.red },
-            ]}
-          >
-            純CF
-          </Text>
-          <Text
-            style={[
-              styles.summaryAmount,
-              { color: net >= 0 ? colors.green : colors.red },
-            ]}
-          >
-            {net >= 0 ? '+' : ''}¥{net.toLocaleString()}
-          </Text>
+          <View style={styles.summaryCardInner}>
+            <Text
+              style={[
+                styles.summaryLabel,
+                { color: net >= 0 ? colors.green : colors.red },
+              ]}
+            >
+              純CF
+            </Text>
+            <Text style={[styles.summaryAmount, { color: colors.t1 }]}>
+              {net >= 0 ? '+' : ''}¥{net.toLocaleString()}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -106,27 +115,31 @@ export default function IncomeListScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterRow}
       >
-        {FILTERS.map((f) => {
-          const active = f === activeFilter;
+        {FILTER_KEYS.map(([k, lb]) => {
+          const active = k === activeFilter;
           return (
             <TouchableOpacity
-              key={f}
-              onPress={() => setActiveFilter(f)}
+              key={k}
+              onPress={() => setActiveFilter(k)}
               style={[
                 styles.pill,
                 {
-                  backgroundColor: active ? colors.green + '21' : 'transparent',
-                  borderColor: active ? colors.green : colors.sep,
+                  backgroundColor: active ? `${colors.green}22` : 'transparent',
+                  borderColor: active ? `${colors.green}44` : colors.sep,
+                  borderWidth: 0.5,
                 },
               ]}
             >
               <Text
                 style={[
                   styles.pillText,
-                  { color: active ? colors.green : colors.t2 },
+                  {
+                    color: active ? colors.green : colors.t3,
+                    fontWeight: active ? '600' : '400',
+                  },
                 ]}
               >
-                {f}
+                {lb}
               </Text>
             </TouchableOpacity>
           );
@@ -151,7 +164,7 @@ export default function IncomeListScreen() {
               <TableRow
                 key={item.id}
                 icon={item.icon}
-                iconBg={colors.green + '21'}
+                iconBg={`${colors.green}22`}
                 title={item.name}
                 subtitle={subtitle}
                 badge={isUSD ? 'USD' : item.tag}
@@ -178,38 +191,38 @@ const styles = StyleSheet.create({
   },
   summaryRow: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.screenPaddingH,
-    marginBottom: spacing.sectionMarginBottom,
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
   summaryCard: {
     flex: 1,
-    borderRadius: radius.hero,
-    padding: spacing.cardPadding,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  summaryCardInner: {
+    padding: 12,
+    paddingHorizontal: 14,
   },
   summaryLabel: {
-    fontSize: fontSize.smallCaption,
+    fontSize: 11,
     fontWeight: '500',
-    marginBottom: 4,
   },
   summaryAmount: {
-    fontSize: fontSize.cardAmount,
+    fontSize: 22,
     fontWeight: '500',
+    marginTop: 2,
   },
   filterRow: {
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 16,
     paddingBottom: 12,
-    gap: 8,
+    gap: 5,
   },
   pill: {
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    minHeight: 32,
-    justifyContent: 'center',
+    borderRadius: 8,
   },
   pillText: {
-    fontSize: fontSize.caption,
-    fontWeight: '500',
+    fontSize: 13,
   },
 });

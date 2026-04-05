@@ -59,8 +59,8 @@ export default function ExpenseDetailScreen() {
             style={[
               styles.heroIcon,
               {
-                backgroundColor: colors.red + '14',
-                shadowColor: colors.heroShadow,
+                backgroundColor: colors.red + '12',
+                shadowColor: colors.red,
               },
             ]}
           >
@@ -72,58 +72,51 @@ export default function ExpenseDetailScreen() {
           </Text>
           {isUSD && (
             <Text style={[styles.heroSub, { color: colors.t2 }]}>
-              ≒ ¥{jpyAmt.toLocaleString()} (@{rate})
+              ≒ ¥{jpyAmt.toLocaleString()}{' '}
+              <Text style={{ fontSize: 11, color: colors.t2 }}>(@{rate})</Text>
             </Text>
           )}
         </View>
 
         {/* Properties */}
         <SectionCard header="プロパティ">
-          <TableRow icon="💳" title="支払手段" right={item.method} />
-          <TableRow icon="🏷" title="用途タグ" right={item.tag} />
-          <TableRow icon="📅" title="日付" right={item.date} />
-          <TableRow icon="📊" title="種別" right={typeLabel} />
-          <TableRow
-            icon="💱"
-            title="通貨"
-            right={item.currency}
-            last={!isUSD}
-          />
-          {isUSD && (
-            <>
-              <TableRow
-                icon="📈"
-                title="レート"
-                right={`¥${rate} / USD`}
-              />
-              <TableRow
-                icon="💴"
-                title="円換算額"
-                right={`¥${jpyAmt.toLocaleString()}`}
-                rightColor={colors.green}
-                last
-              />
-            </>
-          )}
+          {[
+            ['支払手段', item.payment_method],
+            ['用途タグ', item.tag],
+            ['日付', item.date],
+            ['種別', typeLabel],
+            ['通貨', item.currency],
+            ...(isUSD
+              ? [
+                  ['適用レート', `¥${rate} / USD`],
+                  ['円換算額', `¥${jpyAmt.toLocaleString()}`],
+                ]
+              : []),
+          ].map(([label, value], i, arr) => (
+            <TableRow
+              key={i}
+              title={label}
+              right={value}
+              rightColor={label === '円換算額' ? colors.red : colors.t2}
+              last={i === arr.length - 1}
+            />
+          ))}
         </SectionCard>
 
         {/* Actions */}
         <SectionCard header="アクション">
-          <TableRow
-            icon="📋"
-            title="複製"
-            iconBg={colors.blue + '21'}
-            rightColor={colors.blue}
-            onPress={() => {}}
-          />
-          <TableRow
-            icon="🗑"
-            title="削除"
-            iconBg={colors.red + '14'}
-            rightColor={colors.red}
-            last
-            onPress={() => {}}
-          />
+          {[
+            ['複製', colors.blue],
+            ['削除', colors.red],
+          ].map(([label, color], i) => (
+            <TableRow
+              key={i}
+              title={label}
+              rightColor={color}
+              last={i === 1}
+              onPress={() => {}}
+            />
+          ))}
         </SectionCard>
       </ScrollView>
     </SafeAreaView>
@@ -144,7 +137,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    paddingVertical: 28,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
   heroIcon: {
     width: 72,
@@ -152,9 +146,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.09,
     shadowRadius: 12,
     elevation: 4,
   },
@@ -164,11 +157,12 @@ const styles = StyleSheet.create({
   heroName: {
     fontSize: 22,
     fontWeight: '600',
-    marginBottom: 4,
+    marginTop: 12,
   },
   heroAmount: {
-    fontSize: fontSize.detailAmount,
+    fontSize: 36,
     fontWeight: '500',
+    marginTop: 8,
   },
   heroSub: {
     fontSize: 15,

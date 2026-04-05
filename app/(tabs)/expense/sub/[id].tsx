@@ -48,17 +48,7 @@ export default function SubscriptionDetailScreen() {
       >
         {/* Hero section */}
         <View style={styles.hero}>
-          <View
-            style={[
-              styles.heroIcon,
-              {
-                backgroundColor: colors.purple + '14',
-                shadowColor: colors.heroShadow,
-              },
-            ]}
-          >
-            <Text style={styles.heroEmoji}>{item.icon}</Text>
-          </View>
+          <Text style={styles.heroEmoji}>{item.icon}</Text>
           <Text style={[styles.heroName, { color: colors.t1 }]}>{item.name}</Text>
           <Text style={[styles.heroAmount, { color: colors.purple }]}>
             ¥{item.amount.toLocaleString()}/{item.cycle}
@@ -67,33 +57,35 @@ export default function SubscriptionDetailScreen() {
 
         {/* Properties */}
         <SectionCard header="プロパティ">
-          <TableRow icon="💳" title="支払カード" right={item.card} />
-          <TableRow icon="🔄" title="課金サイクル" right={item.cycle} />
-          <TableRow
-            icon="📅"
-            title="次回支払日"
-            right={item.nextDate}
-            last
-          />
+          {[
+            ['支払カード', item.card],
+            ['課金サイクル', item.cycle],
+            ['次回支払日', item.next_payment_date],
+          ].map(([label, value], i) => (
+            <TableRow
+              key={i}
+              title={label}
+              right={value}
+              rightColor={colors.t2}
+              last={i === 2}
+            />
+          ))}
         </SectionCard>
 
         {/* Actions */}
         <SectionCard header="アクション">
-          <TableRow
-            icon="⏸"
-            title="一時停止"
-            iconBg={colors.orange + '21'}
-            rightColor={colors.orange}
-            onPress={() => {}}
-          />
-          <TableRow
-            icon="🗑"
-            title="解約"
-            iconBg={colors.red + '14'}
-            rightColor={colors.red}
-            last
-            onPress={() => {}}
-          />
+          {[
+            ['一時停止', colors.orange],
+            ['解約', colors.red],
+          ].map(([label, color], i) => (
+            <TableRow
+              key={i}
+              title={label}
+              rightColor={color}
+              last={i === 1}
+              onPress={() => {}}
+            />
+          ))}
         </SectionCard>
       </ScrollView>
     </SafeAreaView>
@@ -114,19 +106,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    paddingVertical: 28,
-  },
-  heroIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 4,
+    paddingTop: 12,
+    paddingBottom: 20,
   },
   heroEmoji: {
     fontSize: 48,
@@ -134,10 +115,11 @@ const styles = StyleSheet.create({
   heroName: {
     fontSize: 22,
     fontWeight: '600',
-    marginBottom: 4,
+    marginTop: 8,
   },
   heroAmount: {
     fontSize: 28,
-    fontWeight: '500',
+    fontWeight: '300',
+    marginTop: 8,
   },
 });

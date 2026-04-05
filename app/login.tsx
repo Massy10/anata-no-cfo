@@ -5,14 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { fontSize, spacing } from '@/theme/tokens';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const { colors } = useTheme();
@@ -26,7 +24,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: colors.bg }]}>
-      <View style={styles.flex}>
+      <View style={[styles.flex, styles.container]}>
         {/* Decorative bubbles */}
         <View
           style={[
@@ -35,10 +33,9 @@ export default function LoginScreen() {
               width: 100,
               height: 100,
               borderRadius: 50,
-              backgroundColor: colors.blue,
-              opacity: 0.06,
-              top: 40,
-              right: -20,
+              backgroundColor: `${colors.blue}0F`,
+              top: 60,
+              right: -30,
             },
           ]}
         />
@@ -49,9 +46,8 @@ export default function LoginScreen() {
               width: 80,
               height: 80,
               borderRadius: 40,
-              backgroundColor: colors.purple,
-              opacity: 0.05,
-              bottom: 200,
+              backgroundColor: `${colors.purple}0D`,
+              bottom: 120,
               left: -20,
             },
           ]}
@@ -60,9 +56,23 @@ export default function LoginScreen() {
         {/* Center content */}
         <View style={styles.centerContent}>
           {/* App icon */}
-          <View style={[styles.appIcon, { backgroundColor: colors.blue }]}>
+          <LinearGradient
+            colors={[colors.blue, colors.purple]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[
+              styles.appIcon,
+              {
+                shadowColor: colors.blue,
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.2,
+                shadowRadius: 18,
+                elevation: 8,
+              },
+            ]}
+          >
             <Text style={styles.appIconEmoji}>💰</Text>
-          </View>
+          </LinearGradient>
 
           <Text style={[styles.title, { color: colors.t1 }]}>
             あなたのCFO
@@ -70,35 +80,45 @@ export default function LoginScreen() {
           <Text style={[styles.subtitle, { color: colors.t2 }]}>
             お金の流れを、完全に把握する
           </Text>
-        </View>
 
-        {/* Auth buttons */}
-        <View style={styles.buttonsContainer}>
-          {/* Apple Sign In */}
-          <TouchableOpacity
-            style={[styles.appleButton]}
-            activeOpacity={0.8}
-            onPress={handleSignIn}
-          >
-            <Text style={styles.appleButtonText}>Appleでサインイン</Text>
-          </TouchableOpacity>
-
-          {/* Google Sign In */}
+          {/* Apple button */}
           <TouchableOpacity
             style={[
-              styles.googleButton,
+              styles.appleButton,
               {
-                backgroundColor: colors.heroGlass,
-                borderColor: colors.sep,
+                backgroundColor: colors.t1,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 6,
+                elevation: 3,
               },
             ]}
             activeOpacity={0.8}
             onPress={handleSignIn}
           >
-            <Text style={[styles.googleButtonText, { color: colors.t1 }]}>
-              Googleでサインイン
+            <Text style={[styles.appleButtonText, { color: colors.bg }]}>
+               Appleでサインイン
             </Text>
           </TouchableOpacity>
+
+          {/* Google button */}
+          <View style={[styles.googleButtonOuter, { borderColor: colors.sep }]}>
+            <BlurView intensity={8} style={styles.googleBlur}>
+              <TouchableOpacity
+                style={[
+                  styles.googleButton,
+                  { backgroundColor: colors.heroGlass },
+                ]}
+                activeOpacity={0.8}
+                onPress={handleSignIn}
+              >
+                <Text style={[styles.googleButtonText, { color: colors.t1 }]}>
+                  Googleでサインイン
+                </Text>
+              </TouchableOpacity>
+            </BlurView>
+          </View>
 
           {/* Guest */}
           <TouchableOpacity
@@ -124,6 +144,10 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  container: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
   bubble: {
     position: 'absolute',
   },
@@ -131,7 +155,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: spacing.screenPaddingH,
+    paddingHorizontal: 24,
   },
   appIcon: {
     width: 80,
@@ -139,64 +163,69 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   appIconEmoji: {
-    fontSize: 36,
+    fontSize: 40,
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 15,
+    marginTop: 8,
+    marginBottom: 48,
     textAlign: 'center',
   },
-  buttonsContainer: {
-    paddingHorizontal: spacing.screenPaddingH,
-    paddingBottom: 40,
-    alignItems: 'center',
-  },
   appleButton: {
-    backgroundColor: '#000000',
-    borderRadius: 14,
     width: '100%',
+    borderRadius: 14,
+    padding: 16,
     minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   appleButtonText: {
-    color: '#FFFFFF',
-    fontSize: fontSize.body,
     fontWeight: '600',
+    fontSize: 17,
+  },
+  googleButtonOuter: {
+    width: '100%',
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  googleBlur: {
+    width: '100%',
   },
   googleButton: {
-    borderRadius: 14,
     width: '100%',
+    borderRadius: 14,
+    padding: 16,
     minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 0.5,
-    marginBottom: 20,
   },
   googleButtonText: {
-    fontSize: fontSize.body,
     fontWeight: '600',
+    fontSize: 17,
   },
   guestButton: {
+    marginTop: 16,
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
   },
   guestButtonText: {
     fontSize: 17,
-    fontWeight: '500',
   },
   guestHint: {
     fontSize: 12,
+    marginTop: 6,
     textAlign: 'center',
   },
 });

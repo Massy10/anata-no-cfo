@@ -21,9 +21,10 @@ export function SummaryCard({ label, value, color, variant = 'filled' }: Props) 
         styles.card,
         isOutline
           ? {
-              backgroundColor: color + '0F',
+              backgroundColor: color + '10',
               borderWidth: 0.5,
-              borderColor: color + '21',
+              borderColor: color + '22',
+              borderRadius: 10,
             }
           : { backgroundColor: colors.bg2 },
       ]}
