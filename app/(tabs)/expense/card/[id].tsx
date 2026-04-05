@@ -9,7 +9,7 @@ import { spacing } from '@/theme/tokens';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { CreditCardVisual } from '@/components/cards/CreditCardVisual';
-import { creditCardsData } from '@/constants/mockData';
+import { useCreditCards } from '@/hooks/useCreditCards';
 
 const PRESET_COLORS = [
   { label: 'グリーン', value: '#00A650' },
@@ -26,6 +26,7 @@ export default function CardDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: creditCardsData, update, remove } = useCreditCards();
   const card = creditCardsData.find((c) => c.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -36,8 +37,8 @@ export default function CardDetailScreen() {
   if (!card) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-        <View style={{ alignItems: 'center', paddingTop: 8 }}>
-          <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+        <View style={styles.handle}>
+          <View style={[styles.handleBar, { backgroundColor: colors.bg3 }]} />
         </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: colors.t2 }}>カードが見つかりません</Text>
@@ -46,7 +47,7 @@ export default function CardDetailScreen() {
     );
   }
 
-  const usage = card.balance / card.credit_limit;
+  const usage = card.credit_limit > 0 ? card.balance / card.credit_limit : 0;
   const usagePct = (usage * 100).toFixed(0);
   const barColor = usage > 0.7 ? colors.red : colors.green;
 
@@ -57,33 +58,45 @@ export default function CardDetailScreen() {
     payment_day: paymentDay,
   };
 
-  const handleSave = () => {
-    Alert.alert('保存完了', `${card.name} を更新しました。`, [
-      { text: 'OK', onPress: () => { setIsEditing(false); } },
-    ]);
+  const handleSave = async () => {
+    await update(card.id, {
+      color: selectedColor,
+      closing_day: closingDay,
+      payment_day: paymentDay,
+    });
+    setIsEditing(false);
   };
 
   const handleDelete = () => {
-    Alert.alert('カードを削除', `${card.name} を削除しますか？`, [
-      { text: 'キャンセル', style: 'cancel' },
-      { text: '削除', style: 'destructive', onPress: () => router.back() },
-    ]);
+    Alert.alert(
+      'カードを削除',
+      `「${card.name}」を削除しますか？\nこのカードに関連するデータには影響しません。`,
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            await remove(card.id);
+            router.back();
+          },
+        },
+      ],
+    );
   };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-      {/* Modal handle */}
-      <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
-        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+      <View style={styles.handle}>
+        <View style={[styles.handleBar, { backgroundColor: colors.bg3 }]} />
       </View>
-      {/* Modal nav */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}>
+      <View style={styles.modalNav}>
         <TouchableOpacity onPress={() => isEditing ? setIsEditing(false) : router.back()} style={{ minWidth: 44 }}>
           <Text style={{ fontSize: 17, color: colors.blue }}>
             {isEditing ? 'キャンセル' : '完了'}
           </Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 17, fontWeight: '600', color: colors.t1 }}>
+        <Text style={[styles.navTitle, { color: colors.t1 }]}>
           {isEditing ? 'カードを編集' : 'カード詳細'}
         </Text>
         <TouchableOpacity
@@ -103,15 +116,10 @@ export default function CardDetailScreen() {
         {/* Card visual */}
         <View style={styles.previewContainer}>
           <CreditCardVisual card={displayCard} />
-          {/* Usage bar */}
           <View style={styles.usageBarOuter}>
-            <View style={[styles.usageTextRow, { marginBottom: 6 }]}>
-              <Text style={[styles.usageLabel, { color: colors.t2 }]}>
-                利用率 {usagePct}%
-              </Text>
-              <Text style={[styles.usageLabel, { color: colors.t2 }]}>
-                限度額 ¥{card.credit_limit.toLocaleString()}
-              </Text>
+            <View style={[styles.usageTextRow, { marginBottom: 4 }]}>
+              <Text style={[styles.usageLabel, { color: colors.t2 }]}>利用率 {usagePct}%</Text>
+              <Text style={[styles.usageLabel, { color: colors.t3 }]}>限度額 ¥{card.credit_limit.toLocaleString()}</Text>
             </View>
             <View style={[styles.usageBarBg, { backgroundColor: colors.fill }]}>
               <View style={[styles.usageBarInner, {
@@ -126,18 +134,9 @@ export default function CardDetailScreen() {
         <SectionCard header="カード情報">
           <TableRow title="カード名" right={card.name} rightColor={colors.t2} />
           <TableRow title="下4桁" right={`•••• ${card.last4}`} rightColor={colors.t2} />
-          <TableRow title="限度額" right={`¥${card.credit_limit.toLocaleString()}`} rightColor={colors.blue} />
-          <TableRow
-            title="締日"
-            right={`毎月 ${closingDay}日`}
-            rightColor={colors.t2}
-          />
-          <TableRow
-            title="支払日"
-            right={`翌月 ${paymentDay}日`}
-            rightColor={colors.t2}
-            last
-          />
+          <TableRow title="限度額" right={`¥${card.credit_limit.toLocaleString()}`} rightColor={colors.t2} />
+          <TableRow title="締日" right={`毎月 ${closingDay}日`} rightColor={colors.t2} />
+          <TableRow title="支払日" right={`翌月 ${paymentDay}日`} rightColor={colors.t2} last />
         </SectionCard>
 
         {/* Editing options */}
@@ -175,9 +174,7 @@ export default function CardDetailScreen() {
                         borderColor: closingDay === d ? colors.blue : colors.sep,
                       }]}
                     >
-                      <Text style={[styles.dayText, { color: closingDay === d ? '#FFFFFF' : colors.t2 }]}>
-                        {d}
-                      </Text>
+                      <Text style={[styles.dayText, { color: closingDay === d ? '#FFFFFF' : colors.t2 }]}>{d}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -196,9 +193,7 @@ export default function CardDetailScreen() {
                         borderColor: paymentDay === d ? colors.green : colors.sep,
                       }]}
                     >
-                      <Text style={[styles.dayText, { color: paymentDay === d ? '#FFFFFF' : colors.t2 }]}>
-                        {d}
-                      </Text>
+                      <Text style={[styles.dayText, { color: paymentDay === d ? '#FFFFFF' : colors.t2 }]}>{d}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -207,18 +202,14 @@ export default function CardDetailScreen() {
           </>
         )}
 
-        {/* Actions */}
-        <SectionCard>
-          <TouchableOpacity
-            style={[styles.deleteRow]}
-            onPress={handleDelete}
-            activeOpacity={0.5}
-          >
-            <Text style={{ fontSize: 17, color: colors.red, textAlign: 'center' }}>
-              カードを削除
-            </Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* Delete — 独立・赤文字 */}
+        <TouchableOpacity
+          style={[styles.deleteButton, { borderColor: colors.red + '20' }]}
+          onPress={handleDelete}
+          activeOpacity={0.6}
+        >
+          <Text style={[styles.deleteText, { color: colors.red }]}>このカードを削除</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -226,12 +217,19 @@ export default function CardDetailScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  handle: { alignItems: 'center', paddingTop: 8, paddingBottom: 4 },
+  handleBar: { width: 36, height: 4, borderRadius: 2 },
+  modalNav: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingVertical: 10,
+  },
+  navTitle: { fontSize: 17, fontWeight: '600' },
   previewContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
-  usageBarOuter: { paddingTop: 12, paddingHorizontal: 4 },
+  usageBarOuter: { paddingTop: 10, paddingHorizontal: 4 },
   usageTextRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  usageLabel: { fontSize: 13 },
-  usageBarBg: { height: 6, borderRadius: 3, overflow: 'hidden' },
-  usageBarInner: { height: 6, borderRadius: 3 },
+  usageLabel: { fontSize: 12 },
+  usageBarBg: { height: 5, borderRadius: 3, overflow: 'hidden' },
+  usageBarInner: { height: 5, borderRadius: 3 },
   colorRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, padding: 16 },
   colorSwatch: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   colorSwatchSelected: { borderWidth: 3, borderColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 },
@@ -239,5 +237,14 @@ const styles = StyleSheet.create({
   dayRow: { flexDirection: 'row', gap: 8, padding: 12, paddingHorizontal: 16 },
   dayPill: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 0.5 },
   dayText: { fontSize: 14, fontWeight: '500' },
-  deleteRow: { alignItems: 'center', justifyContent: 'center', minHeight: 44, paddingVertical: 12 },
+  deleteButton: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  deleteText: { fontSize: 16, fontWeight: '500' },
 });

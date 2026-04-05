@@ -6,41 +6,39 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { fontSize, spacing } from '@/theme/tokens';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { toJPY, getRate } from '@/lib/fx';
-import { expenseData } from '@/constants/mockData';
+import { useExpenses } from '@/hooks/useExpenses';
 
 export default function ExpenseDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: expenseData, remove } = useExpenses();
 
   const item = expenseData.find((e) => e.id === id);
 
   if (!item) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-        {/* Modal handle */}
-        <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
-          <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+        <View style={styles.handle}>
+          <View style={[styles.handleBar, { backgroundColor: colors.bg3 }]} />
         </View>
-        {/* Modal nav */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}>
+        <View style={styles.modalNav}>
           <View style={{ width: 44 }} />
-          <Text style={{ fontSize: 17, fontWeight: '600', color: colors.t1 }}>支出詳細</Text>
-          <TouchableOpacity onPress={() => router.back()} style={{ minWidth: 44, alignItems: 'flex-end' }}>
-            <Text style={{ fontSize: 17, color: colors.blue }}>完了</Text>
+          <Text style={[styles.navTitle, { color: colors.t1 }]}>支出詳細</Text>
+          <TouchableOpacity onPress={() => router.back()} style={styles.navRight}>
+            <Text style={[styles.navAction, { color: colors.blue }]}>完了</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: colors.t2 }]}>
-            データが見つかりません
-          </Text>
+          <Text style={[styles.emptyText, { color: colors.t2 }]}>データが見つかりません</Text>
         </View>
       </SafeAreaView>
     );
@@ -52,18 +50,34 @@ export default function ExpenseDetailScreen() {
   const sym = isUSD ? '$' : '¥';
   const typeLabel = item.type === 'fixed' ? '固定費' : '変動費';
 
+  const handleDelete = () => {
+    Alert.alert(
+      '支出を削除',
+      `「${item.name}」（${sym}${item.amount.toLocaleString()}）を削除しますか？\nこの操作は取り消せません。`,
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            await remove(item.id);
+            router.back();
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-      {/* Modal handle */}
-      <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
-        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+      <View style={styles.handle}>
+        <View style={[styles.handleBar, { backgroundColor: colors.bg3 }]} />
       </View>
-      {/* Modal nav */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}>
+      <View style={styles.modalNav}>
         <View style={{ width: 44 }} />
-        <Text style={{ fontSize: 17, fontWeight: '600', color: colors.t1 }}>支出詳細</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ minWidth: 44, alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 17, color: colors.blue }}>完了</Text>
+        <Text style={[styles.navTitle, { color: colors.t1 }]}>支出詳細</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.navRight}>
+          <Text style={[styles.navAction, { color: colors.blue }]}>完了</Text>
         </TouchableOpacity>
       </View>
 
@@ -71,17 +85,9 @@ export default function ExpenseDetailScreen() {
         contentContainerStyle={{ paddingBottom: spacing.screenPaddingBottom }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero section */}
+        {/* Hero */}
         <View style={styles.hero}>
-          <View
-            style={[
-              styles.heroIcon,
-              {
-                backgroundColor: colors.red + '12',
-                shadowColor: colors.red,
-              },
-            ]}
-          >
+          <View style={[styles.heroIcon, { backgroundColor: colors.red + '10' }]}>
             <Text style={styles.heroEmoji}>{item.icon}</Text>
           </View>
           <Text style={[styles.heroName, { color: colors.t1 }]}>{item.name}</Text>
@@ -90,8 +96,7 @@ export default function ExpenseDetailScreen() {
           </Text>
           {isUSD && (
             <Text style={[styles.heroSub, { color: colors.t2 }]}>
-              ≒ ¥{jpyAmt.toLocaleString()}{' '}
-              <Text style={{ fontSize: 11, color: colors.t2 }}>(@{rate})</Text>
+              ≒ ¥{jpyAmt.toLocaleString()} (@{rate})
             </Text>
           )}
         </View>
@@ -115,76 +120,63 @@ export default function ExpenseDetailScreen() {
               key={i}
               title={label}
               right={value}
-              rightColor={label === '円換算額' ? colors.red : colors.t2}
+              rightColor={label === '種別'
+                ? (item.type === 'fixed' ? colors.cyan : colors.red)
+                : label === '円換算額' ? colors.red : colors.t2}
               last={i === arr.length - 1}
             />
           ))}
         </SectionCard>
 
         {/* Actions */}
-        <SectionCard header="アクション">
-          {[
-            ['編集', colors.blue],
-            ['複製', colors.green],
-            ['削除', colors.red],
-          ].map(([label, color], i) => (
-            <TableRow
-              key={i}
-              title={label}
-              rightColor={color}
-              last={i === 2}
-              onPress={label === '編集' ? () => router.push(`/expense/edit/${item.id}`) : () => {}}
-            />
-          ))}
+        <SectionCard>
+          <TableRow
+            title="編集"
+            onPress={() => router.push(`/expense/edit/${item.id}`)}
+            last
+          />
         </SectionCard>
+
+        {/* Delete — 独立・赤文字 */}
+        <TouchableOpacity
+          style={[styles.deleteButton, { borderColor: colors.red + '20' }]}
+          onPress={handleDelete}
+          activeOpacity={0.6}
+        >
+          <Text style={[styles.deleteText, { color: colors.red }]}>この支出を削除</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
+  safe: { flex: 1 },
+  handle: { alignItems: 'center', paddingTop: 8, paddingBottom: 4 },
+  handleBar: { width: 36, height: 4, borderRadius: 2 },
+  modalNav: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingVertical: 10,
   },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: fontSize.body,
-  },
-  hero: {
-    alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 24,
-  },
-  heroIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.09,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  heroEmoji: {
-    fontSize: 36,
-  },
-  heroName: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginTop: 12,
-  },
-  heroAmount: {
-    fontSize: 36,
-    fontWeight: '500',
+  navTitle: { fontSize: 17, fontWeight: '600' },
+  navRight: { minWidth: 44, alignItems: 'flex-end' },
+  navAction: { fontSize: 17 },
+  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  emptyText: { fontSize: fontSize.body },
+  hero: { alignItems: 'center', paddingTop: 16, paddingBottom: 24 },
+  heroIcon: { width: 64, height: 64, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  heroEmoji: { fontSize: 32 },
+  heroName: { fontSize: 20, fontWeight: '600', marginTop: 12 },
+  heroAmount: { fontSize: 34, fontWeight: '500', marginTop: 6 },
+  heroSub: { fontSize: 14, marginTop: 4 },
+  deleteButton: {
+    marginHorizontal: 16,
     marginTop: 8,
+    marginBottom: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
   },
-  heroSub: {
-    fontSize: 15,
-    marginTop: 4,
-  },
+  deleteText: { fontSize: 16, fontWeight: '500' },
 });

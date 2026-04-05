@@ -3,23 +3,25 @@ import {
   View,
   Text,
   ScrollView,
-  TextInput,
+  TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
-import { radius, fontSize, spacing } from '@/theme/tokens';
+import { fontSize, spacing } from '@/theme/tokens';
 import { NavBar } from '@/components/ui/NavBar';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { calcMonthly, calcTotal } from '@/lib/loan';
-import { loansData } from '@/constants/mockData';
+import { useLoans } from '@/hooks/useLoans';
 
 export default function LoanDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: loansData, remove } = useLoans();
 
   const item = loansData.find((l) => l.id === id);
 
@@ -55,12 +57,29 @@ export default function LoanDetailScreen() {
   );
   const simInterest = simTotal - item.principal;
 
+  const handleDelete = () => {
+    Alert.alert(
+      'ローンを削除',
+      `「${item.name}」を削除しますか？\nこの操作は取り消せません。`,
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            await remove(item.id);
+            router.back();
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
       <NavBar
         title="ローン詳細"
         onBack={() => router.back()}
-        rightAction={{ label: '編集', onPress: () => {} }}
       />
 
       <ScrollView
@@ -173,21 +192,22 @@ export default function LoanDetailScreen() {
         </SectionCard>
 
         {/* Actions */}
-        <SectionCard header="アクション">
-          {[
-            ['繰上返済を記録', colors.blue],
-            ['条件変更', colors.orange],
-            ['削除', colors.red],
-          ].map(([label, color], i) => (
-            <TableRow
-              key={i}
-              title={label}
-              rightColor={color}
-              last={i === 2}
-              onPress={() => {}}
-            />
-          ))}
+        <SectionCard>
+          <TableRow
+            title="編集"
+            onPress={() => router.push(`/expense/loan/edit/${item.id}`)}
+            last
+          />
         </SectionCard>
+
+        {/* Delete — 独立・赤文字 */}
+        <TouchableOpacity
+          style={[styles.deleteButton, { borderColor: colors.red + '20' }]}
+          onPress={handleDelete}
+          activeOpacity={0.6}
+        >
+          <Text style={[styles.deleteText, { color: colors.red }]}>このローンを削除</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -259,4 +279,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'baseline',
   },
+  deleteButton: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  deleteText: { fontSize: 16, fontWeight: '500' },
 });

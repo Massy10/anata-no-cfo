@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
@@ -248,26 +249,7 @@ export default function SettingsScreen() {
           ))}
         </SectionCard>
 
-        {/* G. データ */}
-        <SectionCard header={'データ'}>
-          <TableRow
-            icon={'☁️'}
-            iconBg={colors.cyan + '22'}
-            title={'クラウド同期'}
-            right={'有効'}
-            rightColor={colors.green}
-          />
-          <TableRow
-            icon={'📤'}
-            iconBg={colors.green + '22'}
-            title={'データエクスポート'}
-            right={'将来実装'}
-            rightColor={colors.t3}
-            last
-          />
-        </SectionCard>
-
-        {/* H. サポート */}
+        {/* G. サポート */}
         <SectionCard header={'サポート'}>
           <TableRow
             icon={'📄'}
@@ -302,7 +284,20 @@ export default function SettingsScreen() {
           <TouchableOpacity
             style={styles.logoutRow}
             activeOpacity={0.5}
-            onPress={() => signOut()}
+            onPress={() => {
+              Alert.alert(
+                'ログアウト',
+                'ログアウトしますか？',
+                [
+                  { text: 'キャンセル', style: 'cancel' },
+                  {
+                    text: 'ログアウト',
+                    style: 'destructive',
+                    onPress: () => signOut(),
+                  },
+                ],
+              );
+            }}
           >
             <Text style={[styles.logoutText, { color: colors.red }]}>
               {'ログアウト'}
