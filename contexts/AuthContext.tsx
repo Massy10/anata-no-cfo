@@ -31,6 +31,25 @@ const STORAGE_KEYS = {
   GUEST_USER: '@anata_cfo_guest_user',
 } as const;
 
+/** Map a Supabase auth user to our User type */
+function mapSupabaseUser(supabaseUser: any, profile?: CfoProfile | null): User {
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email ?? '',
+    display_name: supabaseUser.user_metadata?.full_name ?? supabaseUser.email ?? 'ユーザー',
+    preferred_currency: 'JPY',
+    preferred_locale: 'ja',
+    plan: 'free',
+    appearance_mode: 'system',
+    cfo_name: profile?.cfoName ?? 'マネーの番人',
+    goal_asset: profile?.goalAsset ?? 1000,
+    goal_cf: profile?.goalCf ?? 10,
+    cfo_chat_count: 0,
+    cfo_chat_reset_at: new Date().toISOString(),
+    created_at: supabaseUser.created_at ?? new Date().toISOString(),
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -66,19 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (_event, newSession) => {
         setSession(newSession);
         if (newSession?.user) {
-          const { data } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', newSession.user.id)
-            .single();
-          if (data) {
-            setUser(data as User);
-          }
+          // Real session — remove any guest user
+          await AsyncStorage.removeItem(STORAGE_KEYS.GUEST_USER);
+          setUser(mapSupabaseUser(newSession.user, cfoProfileState));
         } else {
-          const guestUser = await AsyncStorage.getItem(STORAGE_KEYS.GUEST_USER);
-          if (!guestUser) {
-            setUser(null);
-          }
+          // No Supabase session — fall back to guest if stored
+          const guestRaw = await AsyncStorage.getItem(STORAGE_KEYS.GUEST_USER);
+          setUser(guestRaw ? JSON.parse(guestRaw) : null);
         }
         setIsLoading(false);
       }
@@ -86,9 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Check initial session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      if (!initialSession) {
-        setIsLoading(false);
-      }
+      if (!initialSession) setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -109,16 +120,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEYS.APPEARANCE, mode);
   }, []);
 
+  const signInWithApple = useCallback(async () => {
+    // TODO: implement with expo-apple-authentication
+    // const credential = await AppleAuthentication.signInAsync({...});
+    // const { data, error } = await supabase.auth.signInWithIdToken({
+    //   provider: 'apple',
+    //   token: credential.identityToken,
+    // });
+    throw new Error('Apple Sign In は近日実装予定です');
+  }, []);
+
+  const signInWithGoogle = useCallback(async () => {
+    // TODO: implement with expo-auth-session
+    // const result = await Google.signInAsync({...});
+    // const { data, error } = await supabase.auth.signInWithIdToken({
+    //   provider: 'google',
+    //   token: result.idToken,
+    // });
+    throw new Error('Google Sign In は近日実装予定です');
+  }, []);
+
   const signInAsGuest = useCallback(async () => {
     const guest: User = {
       id: `guest_${Date.now()}`,
       email: '',
-      display_name: '\u30b2\u30b9\u30c8',
+      display_name: 'ゲスト',
       preferred_currency: 'JPY',
       preferred_locale: 'ja',
       plan: 'free',
       appearance_mode: 'system',
-      cfo_name: cfoProfileState?.cfoName ?? '\u30de\u30cd\u30fc\u306e\u756a\u4eba',
+      cfo_name: cfoProfileState?.cfoName ?? 'マネーの番人',
       goal_asset: cfoProfileState?.goalAsset ?? 1000,
       goal_cf: cfoProfileState?.goalCf ?? 10,
       cfo_chat_count: 0,
@@ -128,16 +159,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(guest);
     await AsyncStorage.setItem(STORAGE_KEYS.GUEST_USER, JSON.stringify(guest));
   }, [cfoProfileState]);
-
-  const signInWithApple = useCallback(async () => {
-    // Will be implemented with expo-apple-authentication + Supabase auth.signInWithIdToken
-    await signInAsGuest();
-  }, [signInAsGuest]);
-
-  const signInWithGoogle = useCallback(async () => {
-    // Will be implemented with expo-auth-session + Supabase auth.signInWithIdToken
-    await signInAsGuest();
-  }, [signInAsGuest]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
