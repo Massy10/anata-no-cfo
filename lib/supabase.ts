@@ -1,13 +1,40 @@
 import { createClient } from '@supabase/supabase-js';
-import * as SecureStore from 'expo-secure-store';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
 const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => SecureStore.getItemAsync(key),
-  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+  getItem: async (key: string): Promise<string | null> => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(key);
+    }
+    try {
+      const SecureStore = require('expo-secure-store');
+      return await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem(key, value);
+      return;
+    }
+    try {
+      const SecureStore = require('expo-secure-store');
+      await SecureStore.setItemAsync(key, value);
+    } catch {}
+  },
+  removeItem: async (key: string): Promise<void> => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem(key);
+      return;
+    }
+    try {
+      const SecureStore = require('expo-secure-store');
+      await SecureStore.deleteItemAsync(key);
+    } catch {}
+  },
 };
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

@@ -47,7 +47,7 @@ export default function SettingsScreen() {
   const { user, appearanceMode, setAppearanceMode, signOut, cfoProfile } =
     useAuth();
 
-  const cfoName = cfoProfile?.cfoName || '\u30de\u30cd\u30fc\u306e\u756a\u4eba';
+  const cfoName = cfoProfile?.cfoName || 'マネーの番人';
   const goalAsset = cfoProfile?.goalAsset ?? 1000;
   const goalCf = cfoProfile?.goalCf ?? 10;
   const displayName = user?.display_name || 'MASASHI';
@@ -56,9 +56,9 @@ export default function SettingsScreen() {
   const initial = displayName.charAt(0).toUpperCase();
 
   const appearanceModes: { key: AppearanceMode; icon: string; label: string }[] = [
-    { key: 'light', icon: '\u2600\ufe0f', label: '\u30e9\u30a4\u30c8' },
-    { key: 'dark', icon: '\ud83c\udf19', label: '\u30c0\u30fc\u30af' },
-    { key: 'system', icon: '\ud83d\udcf1', label: '\u30b7\u30b9\u30c6\u30e0\u3068\u540c\u3058' },
+    { key: 'light', icon: '☀️', label: 'ライト' },
+    { key: 'dark', icon: '🌙', label: 'ダーク' },
+    { key: 'system', icon: '📱', label: 'システムと同じ' },
   ];
 
   return (
@@ -69,7 +69,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* A. LargeTitle */}
-        <LargeTitle title="\u8a2d\u5b9a" />
+        <LargeTitle title="設定" />
 
         {/* B. Profile Section */}
         <SectionCard>
@@ -121,10 +121,10 @@ export default function SettingsScreen() {
               ]}
             />
             <Text style={[styles.proTitle, { color: colors.t1 }]}>
-              {'Pro \u306b\u30a2\u30c3\u30d7\u30b0\u30ec\u30fc\u30c9'}
+              {'Pro にアップグレード'}
             </Text>
             <Text style={[styles.proDesc, { color: colors.t2 }]}>
-              {'CFO\u30c1\u30e3\u30c3\u30c8100\u56de/\u6708\u30fb12\u30f6\u6708\u4e88\u6e2c\u30fbOCR\u7121\u5236\u9650\u30fb\u5e83\u544a\u975e\u8868\u793a'}
+              {'CFOチャット100回/月・12ヶ月予測・OCR無制限・広告非表示'}
             </Text>
             <View style={styles.proPriceRow}>
               <TouchableOpacity
@@ -143,7 +143,7 @@ export default function SettingsScreen() {
                   <BlurView intensity={8} tint="default" style={StyleSheet.absoluteFill} />
                 )}
                 <Text style={[styles.priceBtnText, { color: colors.blue }]}>
-                  {'\u00a5300/\u6708'}
+                  {'¥300/月'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -157,10 +157,10 @@ export default function SettingsScreen() {
                   style={styles.priceBtnAnnual}
                 >
                   <Text style={styles.priceBtnAnnualText}>
-                    {'\u00a53,000/\u5e74'}
+                    {'¥3,000/年'}
                   </Text>
                   <Text style={styles.priceBtnAnnualSub}>
-                    {'2\u30f6\u6708\u5206\u304a\u5f97'}
+                    {'2ヶ月分お得'}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -168,50 +168,50 @@ export default function SettingsScreen() {
           </LinearGradient>
         </View>
 
-        {/* D. CFO\u8a2d\u5b9a */}
-        <SectionCard header={'CFO\u8a2d\u5b9a'}>
+        {/* D. CFO設定 */}
+        <SectionCard header={'CFO設定'}>
           <TableRow
-            icon={'\ud83e\udde0'}
+            icon={'🧠'}
             iconBg={colors.purple + '22'}
-            title={'CFO\u540d'}
+            title={'CFO名'}
             right={cfoName}
           />
           <TableRow
-            icon={'\ud83c\udfaf'}
+            icon={'🎯'}
             iconBg={colors.blue + '22'}
-            title={'\u76ee\u6a19\u7dcf\u8cc7\u7523'}
-            right={goalAsset.toLocaleString() + '\u4e07\u5186'}
+            title={'目標総資産'}
+            right={goalAsset.toLocaleString() + '万円'}
             rightColor={colors.blue}
           />
           <TableRow
-            icon={'\ud83d\udcc8'}
+            icon={'📈'}
             iconBg={colors.green + '22'}
-            title={'\u6708\u9593\u76ee\u6a19CF'}
-            right={'+' + goalCf + '\u4e07\u5186'}
+            title={'月間目標CF'}
+            right={'+' + goalCf + '万円'}
             rightColor={colors.green}
             last
           />
         </SectionCard>
 
-        {/* E. \u4e00\u822c */}
-        <SectionCard header={'\u4e00\u822c'}>
+        {/* E. 一般 */}
+        <SectionCard header={'一般'}>
           <TableRow
-            icon={'\ud83d\udcb4'}
+            icon={'💴'}
             iconBg={colors.orange + '22'}
-            title={'\u901a\u8ca8'}
-            right={'JPY\uff08\u65e5\u672c\u5186\uff09'}
+            title={'通貨'}
+            right={'JPY（日本円）'}
           />
           <TableRow
-            icon={'\ud83c\udf10'}
+            icon={'🌐'}
             iconBg={colors.blue + '22'}
-            title={'\u8a00\u8a9e'}
-            right={'\u65e5\u672c\u8a9e'}
+            title={'言語'}
+            right={'日本語'}
             last
           />
         </SectionCard>
 
-        {/* F. \u5916\u89b3\u30e2\u30fc\u30c9 */}
-        <SectionCard header={'\u5916\u89b3\u30e2\u30fc\u30c9'}>
+        {/* F. 外観モード */}
+        <SectionCard header={'外観モード'}>
           {appearanceModes.map((mode, i) => (
             <TouchableOpacity
               key={mode.key}
@@ -248,56 +248,56 @@ export default function SettingsScreen() {
           ))}
         </SectionCard>
 
-        {/* G. \u30c7\u30fc\u30bf */}
-        <SectionCard header={'\u30c7\u30fc\u30bf'}>
+        {/* G. データ */}
+        <SectionCard header={'データ'}>
           <TableRow
-            icon={'\u2601\ufe0f'}
+            icon={'☁️'}
             iconBg={colors.cyan + '22'}
-            title={'\u30af\u30e9\u30a6\u30c9\u540c\u671f'}
-            right={'\u6709\u52b9'}
+            title={'クラウド同期'}
+            right={'有効'}
             rightColor={colors.green}
           />
           <TableRow
-            icon={'\ud83d\udce4'}
+            icon={'📤'}
             iconBg={colors.green + '22'}
-            title={'\u30c7\u30fc\u30bf\u30a8\u30af\u30b9\u30dd\u30fc\u30c8'}
-            right={'\u5c06\u6765\u5b9f\u88c5'}
+            title={'データエクスポート'}
+            right={'将来実装'}
             rightColor={colors.t3}
             last
           />
         </SectionCard>
 
-        {/* H. \u30b5\u30dd\u30fc\u30c8 */}
-        <SectionCard header={'\u30b5\u30dd\u30fc\u30c8'}>
+        {/* H. サポート */}
+        <SectionCard header={'サポート'}>
           <TableRow
-            icon={'\ud83d\udcc4'}
+            icon={'📄'}
             iconBg={colors.t3 + '22'}
-            title={'\u30d7\u30e9\u30a4\u30d0\u30b7\u30fc\u30dd\u30ea\u30b7\u30fc'}
+            title={'プライバシーポリシー'}
             onPress={() => {}}
           />
           <TableRow
-            icon={'\ud83d\udccb'}
+            icon={'📋'}
             iconBg={colors.t3 + '22'}
-            title={'\u5229\u7528\u898f\u7d04'}
+            title={'利用規約'}
             onPress={() => {}}
           />
           <TableRow
-            icon={'\ud83d\udcac'}
+            icon={'💬'}
             iconBg={colors.blue + '22'}
-            title={'\u304a\u554f\u3044\u5408\u308f\u305b'}
+            title={'お問い合わせ'}
             onPress={() => {}}
           />
           <TableRow
-            icon={'\u2139\ufe0f'}
+            icon={'ℹ️'}
             iconBg={colors.t3 + '22'}
-            title={'\u30d0\u30fc\u30b8\u30e7\u30f3'}
+            title={'バージョン'}
             right="1.0.0"
             rightColor={colors.t3}
             last
           />
         </SectionCard>
 
-        {/* I. \u30ed\u30b0\u30a2\u30a6\u30c8 */}
+        {/* I. ログアウト */}
         <SectionCard>
           <TouchableOpacity
             style={styles.logoutRow}
@@ -305,14 +305,14 @@ export default function SettingsScreen() {
             onPress={() => signOut()}
           >
             <Text style={[styles.logoutText, { color: colors.red }]}>
-              {'\u30ed\u30b0\u30a2\u30a6\u30c8'}
+              {'ログアウト'}
             </Text>
           </TouchableOpacity>
         </SectionCard>
 
         {/* J. Footer */}
         <Text style={[styles.footer, { color: colors.t3 }]}>
-          {'\u3042\u306a\u305f\u306eCFO v1.0.0'}
+          {'あなたのCFO v1.0.0'}
         </Text>
       </ScrollView>
     </SafeAreaView>

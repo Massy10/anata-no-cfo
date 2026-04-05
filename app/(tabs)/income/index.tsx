@@ -113,6 +113,7 @@ export default function IncomeListScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={{ flexShrink: 0, flexGrow: 0 }}
         contentContainerStyle={styles.filterRow}
       >
         {FILTER_KEYS.map(([k, lb]) => {
@@ -157,7 +158,7 @@ export default function IncomeListScreen() {
             const rate = getRate(item.date);
             const sym = item.currency === 'USD' ? '$' : '¥';
 
-            let subtitle = `${item.method} · ${item.date}`;
+            let subtitle = `${item.payment_method} · ${item.date}`;
             if (isUSD) subtitle += ` · ¥${jpyAmt.toLocaleString()}換算`;
 
             return (
@@ -216,11 +217,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     gap: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   pill: {
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 8,
+    alignSelf: 'flex-start',
   },
   pillText: {
     fontSize: 13,

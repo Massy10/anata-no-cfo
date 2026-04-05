@@ -26,16 +26,16 @@ type Message = {
 
 function getMockResponse(text: string): string {
   const lower = text.toLowerCase();
-  if (lower.includes('\u30b5\u30d6\u30b9\u30af') || lower === '1') {
-    return '\u73fe\u5728\u306e\u30b5\u30d6\u30b9\u30af\u72b6\u6cc1\u3092\u5206\u6790\u3057\u307e\u3057\u305f\u3002\n\n\ud83c\udfb5 Spotify: \u00a5980/\u6708\n\ud83c\udfa8 Netflix: \u00a51,490/\u6708\n\u2601\ufe0f iCloud+: \u00a5400/\u6708\n\ud83d\udcaa \u30b8\u30e0\u4f1a\u8cbb: \u00a58,800/\u6708\n\n\u5408\u8a08: \u00a511,670/\u6708\n\n\ud83d\udca1 \u63d0\u6848:\n\u2022 Spotify + Netflix \u2192 \u97f3\u697d\u306fYouTube Premium(\u00a51,280)\u306b\u7d71\u5408\u3059\u308b\u3068\u6708\u00a51,190\u7bc0\u7d04\n\u2022 \u30b8\u30e0\u306f\u5e02\u533a\u753a\u6751\u306e\u65bd\u8a2d\u3092\u691c\u8a0e\u3059\u308b\u3068\u6708\u00a56,000\u4ee5\u4e0a\u306e\u524a\u6e1b\u4f59\u5730\n\n\u5e74\u9593\u3067\u7d04\u00a586,000\u306e\u7bc0\u7d04\u304c\u898b\u8fbc\u3081\u307e\u3059\u3002\u8a73\u3057\u304f\u898b\u307e\u3057\u3087\u3046\u304b\uff1f';
+  if (lower.includes('サブスク') || lower === '1') {
+    return '現在のサブスク状況を分析しました。\n\n🎵 Spotify: ¥980/月\n🎨 Netflix: ¥1,490/月\n☁️ iCloud+: ¥400/月\n💪 ジム会費: ¥8,800/月\n\n合計: ¥11,670/月\n\n💡 提案:\n• Spotify + Netflix → 音楽はYouTube Premium(¥1,280)に統合すると月¥1,190節約\n• ジムは市区町村の施設を検討すると月¥6,000以上の削減余地\n\n年間で約¥86,000の節約が見込めます。詳しく見ましょうか？';
   }
-  if (lower.includes('\u56fa\u5b9a\u8cbb') || lower === '2') {
-    return '\u56fa\u5b9a\u8cbb\u306e\u5206\u6790\u7d50\u679c\u3067\u3059\u3002\n\n\ud83c\udfe0 \u5bb6\u8cc3: \u00a595,000 \u2192 \u6700\u5927\u652f\u51fa\u3002\u5f15\u3063\u8d8a\u3057\u3067\u00a510,000\u4ee5\u4e0a\u306e\u524a\u6e1b\u4f59\u5730\n\u26a1 \u96fb\u6c17\u4ee3: \u00a58,500 \u2192 \u96fb\u529b\u4f1a\u793e\u306e\u5207\u308a\u66ff\u3048\u3067\u00a51,000\u301c\u00a52,000\u7bc0\u7d04\n\ud83d\udcf1 \u643a\u5e2f\u4ee3: \u00a53,800 \u2192 \u3059\u3067\u306b\u683c\u5b89\u30d7\u30e9\u30f3\u3002\u826f\u597d\n\n\ud83d\udcca \u56fa\u5b9a\u8cbb\u7387: \u7d0468%\uff08\u7406\u60f3\u306f60%\u4ee5\u4e0b\uff09\n\n\u307e\u305a\u96fb\u6c17\u4ee3\u306e\u30d7\u30e9\u30f3\u5909\u66f4\u304b\u3089\u59cb\u3081\u307e\u305b\u3093\u304b\uff1f\u624b\u7d9a\u304d\u306f10\u5206\u3067\u5b8c\u4e86\u3057\u307e\u3059\u3002';
+  if (lower.includes('固定費') || lower === '2') {
+    return '固定費の分析結果です。\n\n🏠 家賃: ¥95,000 → 最大支出。引っ越しで¥10,000以上の削減余地\n⚡ 電気代: ¥8,500 → 電力会社の切り替えで¥1,000〜¥2,000節約\n📱 携帯代: ¥3,800 → すでに格安プラン。良好\n\n📊 固定費率: 約68%（理想は60%以下）\n\nまず電気代のプラン変更から始めませんか？手続きは10分で完了します。';
   }
-  if (lower.includes('\u526f\u696d') || lower === '3') {
-    return '\u526f\u696d\u53ce\u5165\u306e\u5206\u6790\u3067\u3059\u3002\n\n\u73fe\u5728\u306e\u526f\u696d\u53ce\u5165:\n\ud83d\udcbb \u30d5\u30ea\u30fc\u30e9\u30f3\u30b9: \u00a5120,000/\u6708\n\ud83c\udfb5 \u97f3\u697d\u914d\u4fe1: \u00a58,500/\u6708\n\ud83d\udcbc \u30b3\u30f3\u30b5\u30eb: $1,200/\u6708\uff08\u2248\u00a5179,400\uff09\n\n\u5408\u8a08: \u7d04\u00a5307,900/\u6708\n\n\u26a0\ufe0f \u30ea\u30b9\u30af:\n\u2022 \u30d5\u30ea\u30fc\u30e9\u30f3\u30b9\u306f1\u793e\u4f9d\u5b58\u3002\u5951\u7d04\u7d42\u4e86\u6642\u306e\u30ea\u30b9\u30af\u5927\n\u2022 \u30b3\u30f3\u30b5\u30eb\u3082\u5358\u4e00\u30af\u30e9\u30a4\u30a2\u30f3\u30c8\n\n\ud83d\udca1 \u63d0\u6848:\n1. \u30d5\u30ea\u30fc\u30e9\u30f3\u30b9\u306f2\u793e\u4ee5\u4e0a\u306b\u5206\u6563\n2. \u30b3\u30f3\u30b5\u30eb\u306f\u6708\u984d\u5951\u7d04\u3092\u63d0\u6848\n3. \u97f3\u697d\u914d\u4fe1\u306f\u30ab\u30bf\u30ed\u30b0\u62e1\u5145\u3067\u00a515,000\u76ee\u6a19\n\n\u5b89\u5b9a\u6027\u30b9\u30b3\u30a2: 4/10\uff08\u8981\u6539\u5584\uff09';
+  if (lower.includes('副業') || lower === '3') {
+    return '副業収入の分析です。\n\n現在の副業収入:\n💻 フリーランス: ¥120,000/月\n🎵 音楽配信: ¥8,500/月\n💼 コンサル: $1,200/月（≈¥179,400）\n\n合計: 約¥307,900/月\n\n⚠️ リスク:\n• フリーランスは1社依存。契約終了時のリスク大\n• コンサルも単一クライアント\n\n💡 提案:\n1. フリーランスは2社以上に分散\n2. コンサルは月額契約を提案\n3. 音楽配信はカタログ拡充で¥15,000目標\n\n安定性スコア: 4/10（要改善）';
   }
-  return '\u73fe\u5728\u306e\u8ca1\u52d9\u72b6\u6cc1\u3092\u307e\u3068\u3081\u307e\u3059\u3002\n\n\ud83d\udcca \u6708\u9593\u53ce\u652f:\n\u2022 \u53ce\u5165: \u00a5615,000\n\u2022 \u652f\u51fa: \u00a5295,000\n\u2022 \u7d14CF: +\u00a5320,000\n\n\u76ee\u6a19\u9054\u6210\u7387\u306f\u826f\u597d\u3067\u3059\u3002\n\n\u3082\u3046\u5c11\u3057\u5177\u4f53\u7684\u306a\u8cea\u554f\u304c\u3042\u308c\u3070\u3001\u3088\u308a\u8a73\u3057\u304f\u5206\u6790\u3067\u304d\u307e\u3059\u3002\u4f8b\u3048\u3070\u300c\u30b5\u30d6\u30b9\u30af\u3092\u898b\u76f4\u3057\u305f\u3044\u300d\u300c\u56fa\u5b9a\u8cbb\u3092\u4e0b\u3052\u305f\u3044\u300d\u306a\u3069\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002';
+  return '現在の財務状況をまとめます。\n\n📊 月間収支:\n• 収入: ¥615,000\n• 支出: ¥295,000\n• 純CF: +¥320,000\n\n目標達成率は良好です。\n\nもう少し具体的な質問があれば、より詳しく分析できます。例えば「サブスクを見直したい」「固定費を下げたい」などお試しください。';
 }
 
 export default function CfoChatScreen() {
@@ -45,7 +45,7 @@ export default function CfoChatScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [input, setInput] = useState('');
 
-  const cfoName = cfoProfile?.cfoName || '\u30de\u30cd\u30fc\u306e\u756a\u4eba';
+  const cfoName = cfoProfile?.cfoName || 'マネーの番人';
   const goalA = cfoProfile?.goalAsset ?? 1000;
   const goalCf = cfoProfile?.goalCf ?? 10;
 
@@ -64,28 +64,28 @@ export default function CfoChatScreen() {
   const goalCfYen = goalCf * 10000;
   const status =
     netCF >= goalCfYen
-      ? '\u9806\u8abf\u3067\u3059'
-      : '\u3042\u3068\u00a5' +
+      ? '順調です'
+      : 'あと¥' +
         (goalCfYen - netCF).toLocaleString() +
-        '\u8db3\u308a\u307e\u305b\u3093';
+        '足りません';
 
   const initialMessages: Message[] = [
     {
       role: 'cfo',
-      text: `\u3053\u3093\u306b\u3061\u306f\u3001${cfoName}\u3067\u3059\u3002\n\n\u73fe\u5728\u306e\u6708\u9593CF\u306f +\u00a5${netCF.toLocaleString()} \u3067\u3001\u76ee\u6a19\u306e +\u00a5${goalCf}0,000 \u306b\u5bfe\u3057\u3066${status}\u3002\n\n\u307e\u305a3\u3064\u306e\u6539\u5584\u63d0\u6848\u304c\u3042\u308a\u307e\u3059\u3002\u3069\u308c\u306b\u3064\u3044\u3066\u8a73\u3057\u304f\u8a71\u3057\u307e\u3057\u3087\u3046\u304b\uff1f`,
+      text: `こんにちは、${cfoName}です。\n\n現在の月間CFは +¥${netCF.toLocaleString()} で、目標の +¥${goalCf}0,000 に対して${status}。\n\nまず3つの改善提案があります。どれについて詳しく話しましょうか？`,
     },
     {
       role: 'cfo',
-      text: '\ud83d\udcca \u63d0\u68481: \u30b5\u30d6\u30b9\u30af\u898b\u76f4\u3057\nNetflix + Spotify\u306e\u91cd\u8907\u3092\u6574\u7406\u3059\u308b\u3068\u6708 \u00a5980\u301c\u00a51,490 \u524a\u6e1b\u3002\n\n\ud83d\udca1 \u63d0\u68482: \u56fa\u5b9a\u8cbb\u4ea4\u6e09\n\u96fb\u6c17\u4ee3\u306e\u30d7\u30e9\u30f3\u5909\u66f4\u3067\u6708 \u00a51,000\u301c\u00a52,000 \u306e\u7bc0\u7d04\u4f59\u5730\u3002\n\n\ud83d\udcc8 \u63d0\u68483: \u526f\u696d\u53ce\u5165\u306e\u5b89\u5b9a\u5316\n\u6708 \u00a585,000 \u306e\u526f\u696d\u53ce\u5165\u3092\u5b89\u5b9a\u3055\u305b\u308b\u305f\u3081\u3001\u8907\u6570\u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u5316\u3092\u63a8\u5968\u3002',
+      text: '📊 提案1: サブスク見直し\nNetflix + Spotifyの重複を整理すると月 ¥980〜¥1,490 削減。\n\n💡 提案2: 固定費交渉\n電気代のプラン変更で月 ¥1,000〜¥2,000 の節約余地。\n\n📈 提案3: 副業収入の安定化\n月 ¥85,000 の副業収入を安定させるため、複数クライアント化を推奨。',
     },
   ];
 
   const [messages, setMessages] = useState<Message[]>(initialMessages);
 
   const suggestions = [
-    '\u30b5\u30d6\u30b9\u30af\u3092\u898b\u76f4\u3057\u305f\u3044',
-    '\u56fa\u5b9a\u8cbb\u3092\u4e0b\u3052\u305f\u3044',
-    '\u526f\u696d\u3092\u5b89\u5b9a\u3055\u305b\u305f\u3044',
+    'サブスクを見直したい',
+    '固定費を下げたい',
+    '副業を安定させたい',
   ];
 
   const sendMessage = useCallback(
@@ -124,7 +124,7 @@ export default function CfoChatScreen() {
           title={cfoName}
           onBack={() => router.back()}
           rightAction={{
-            label: '\u76ee\u6a19',
+            label: '目標',
             onPress: () => router.push('/settings'),
           }}
         />
@@ -133,18 +133,18 @@ export default function CfoChatScreen() {
         <View style={styles.goalBar}>
           <View style={[styles.goalPill, { backgroundColor: colors.bg2 }]}>
             <Text style={[styles.goalLabel, { color: colors.t3 }]}>
-              {'\u76ee\u6a19\u8cc7\u7523'}
+              {'目標資産'}
             </Text>
             <Text style={[styles.goalValue, { color: colors.blue }]}>
-              {goalA}\u4e07
+              {goalA}万
             </Text>
           </View>
           <View style={[styles.goalPill, { backgroundColor: colors.bg2 }]}>
             <Text style={[styles.goalLabel, { color: colors.t3 }]}>
-              {'\u6708\u9593CF'}
+              {'月間CF'}
             </Text>
             <Text style={[styles.goalValue, { color: colors.green }]}>
-              +{goalCf}\u4e07
+              +{goalCf}万
             </Text>
           </View>
         </View>
@@ -177,7 +177,7 @@ export default function CfoChatScreen() {
                       end={{ x: 1, y: 1 }}
                       style={styles.avatarCircle}
                     >
-                      <Text style={styles.avatarEmoji}>{'\ud83e\udde0'}</Text>
+                      <Text style={styles.avatarEmoji}>{'🧠'}</Text>
                     </LinearGradient>
                   </View>
                 )}
@@ -253,7 +253,7 @@ export default function CfoChatScreen() {
                 color: colors.t1,
               },
             ]}
-            placeholder={`${cfoName}\u306b\u8cea\u554f\u3059\u308b...`}
+            placeholder={`${cfoName}に質問する...`}
             placeholderTextColor={colors.t3}
             value={input}
             onChangeText={setInput}
@@ -271,7 +271,7 @@ export default function CfoChatScreen() {
             onPress={() => sendMessage(input)}
             disabled={!hasInput}
           >
-            <Text style={styles.sendArrow}>{'\u2191'}</Text>
+            <Text style={styles.sendArrow}>{'↑'}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/theme/useTheme';
 import { fontSize, spacing } from '@/theme/tokens';
-import { NavBar } from '@/components/ui/NavBar';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { TableRow } from '@/components/ui/TableRow';
 import { toJPY, getRate } from '@/lib/fx';
@@ -25,7 +25,18 @@ export default function IncomeDetailScreen() {
   if (!item) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-        <NavBar title="収入詳細" onBack={() => router.back()} />
+        {/* Modal handle */}
+        <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
+          <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+        </View>
+        {/* Modal nav */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}>
+          <View style={{ width: 44 }} />
+          <Text style={{ fontSize: 17, fontWeight: '600', color: colors.t1 }}>収入詳細</Text>
+          <TouchableOpacity onPress={() => router.back()} style={{ minWidth: 44, alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 17, color: colors.blue }}>完了</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.emptyContainer}>
           <Text style={[styles.emptyText, { color: colors.t2 }]}>
             データが見つかりません
@@ -42,11 +53,18 @@ export default function IncomeDetailScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
-      <NavBar
-        title="収入詳細"
-        onBack={() => router.back()}
-        rightAction={{ label: '編集', onPress: () => {} }}
-      />
+      {/* Modal handle */}
+      <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
+        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.bg3 }} />
+      </View>
+      {/* Modal nav */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}>
+        <View style={{ width: 44 }} />
+        <Text style={{ fontSize: 17, fontWeight: '600', color: colors.t1 }}>収入詳細</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ minWidth: 44, alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 17, color: colors.blue }}>完了</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: spacing.screenPaddingBottom }}
@@ -84,7 +102,7 @@ export default function IncomeDetailScreen() {
         {/* Properties */}
         <SectionCard header="プロパティ">
           {[
-            ['受取方法', item.method],
+            ['受取方法', item.payment_method],
             ['カテゴリ', item.tag],
             ['日付', item.date],
             ['通貨', item.currency],

@@ -93,6 +93,7 @@ export default function ExpenseTabScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={{ flexShrink: 0, flexGrow: 0 }}
         contentContainerStyle={styles.filterRow}
       >
         {EXPENSE_FILTERS.map((f) => {
@@ -448,12 +449,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     gap: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   pill: {
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
+    alignSelf: 'flex-start',
   },
   pillText: {
     fontSize: 13,
