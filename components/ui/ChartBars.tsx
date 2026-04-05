@@ -15,9 +15,9 @@ type Props = {
   barWidth?: number;
 };
 
-const MAX_BAR_HEIGHT = 100;
+const MAX_BAR_HEIGHT = 90;
 
-export function ChartBars({ data, dashed = false, count, barWidth = 16 }: Props) {
+export function ChartBars({ data, dashed = false, count, barWidth = 14 }: Props) {
   const { colors } = useTheme();
   const displayData = count != null ? data.slice(0, count) : data;
 
@@ -52,14 +52,15 @@ export function ChartBars({ data, dashed = false, count, barWidth = 16 }: Props)
                   {
                     width: barWidth,
                     height: barHeight(d.inc),
-                    backgroundColor: dashed ? colors.blue + '44' : colors.blue,
-                    borderTopLeftRadius: 5,
-                    borderTopRightRadius: 5,
+                    backgroundColor: dashed ? colors.green + '30' : colors.green + 'CC',
+                    borderTopLeftRadius: 4,
+                    borderTopRightRadius: 4,
                   },
                   dashed && {
                     borderWidth: 1,
                     borderStyle: 'dashed' as const,
-                    borderColor: colors.blue + '88',
+                    borderColor: colors.green + '66',
+                    backgroundColor: 'transparent',
                   },
                 ]}
               />
@@ -69,19 +70,20 @@ export function ChartBars({ data, dashed = false, count, barWidth = 16 }: Props)
                   {
                     width: barWidth,
                     height: barHeight(d.exp),
-                    backgroundColor: dashed ? colors.red + '33' : colors.red + 'DD',
-                    borderTopLeftRadius: 5,
-                    borderTopRightRadius: 5,
+                    backgroundColor: dashed ? colors.red + '25' : colors.red + 'AA',
+                    borderTopLeftRadius: 4,
+                    borderTopRightRadius: 4,
                   },
                   dashed && {
                     borderWidth: 1,
                     borderStyle: 'dashed' as const,
-                    borderColor: colors.red + '66',
+                    borderColor: colors.red + '55',
+                    backgroundColor: 'transparent',
                   },
                 ]}
               />
             </View>
-            <Text style={[styles.monthLabel, { color: colors.t2 }]}>
+            <Text style={[styles.monthLabel, { color: colors.t3 }]}>
               {d.m}
             </Text>
           </View>
@@ -93,10 +95,10 @@ export function ChartBars({ data, dashed = false, count, barWidth = 16 }: Props)
 
 const styles = StyleSheet.create({
   container: {
-    height: 140,
+    height: 130,
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 6,
+    gap: 4,
     paddingHorizontal: 4,
   },
   column: {
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 2,
-    height: 100,
+    height: MAX_BAR_HEIGHT,
   },
   bar: {
     minHeight: 2,

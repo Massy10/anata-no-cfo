@@ -29,7 +29,7 @@ export function SectionCard({ header, footer, children }: Props) {
         {children}
       </View>
       {footer != null && (
-        <Text style={[styles.footer, { color: colors.t2 }]}>{footer}</Text>
+        <Text style={[styles.footer, { color: colors.t3 }]}>{footer}</Text>
       )}
     </View>
   );
@@ -42,11 +42,9 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: fontSize.caption,
-    fontWeight: '400',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontWeight: '500',
     paddingHorizontal: 4,
-    paddingTop: 8,
+    paddingTop: 4,
     paddingBottom: 6,
   },
   card: {
@@ -54,14 +52,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 1,
   },
   footer: {
-    fontSize: fontSize.caption,
+    fontSize: 12,
     fontWeight: '400',
     paddingHorizontal: 4,
-    paddingTop: 6,
+    paddingTop: 5,
   },
 });
 

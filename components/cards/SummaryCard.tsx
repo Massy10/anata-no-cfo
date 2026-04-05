@@ -1,34 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/useTheme';
-import { radius } from '@/theme/tokens';
 
 type Props = {
   label: string;
   value: string;
   color: string;
-  variant?: 'outline' | 'filled';
 };
 
-export function SummaryCard({ label, value, color, variant = 'filled' }: Props) {
+/**
+ * 数値サマリーカード。1色 = 1意味。
+ * variant 分岐を廃止し、全て同じスタイルに統一。
+ */
+export function SummaryCard({ label, value, color }: Props) {
   const { colors } = useTheme();
 
-  const isOutline = variant === 'outline';
-
   return (
-    <View
-      style={[
-        styles.card,
-        isOutline
-          ? {
-              backgroundColor: color + '10',
-              borderWidth: 0.5,
-              borderColor: color + '22',
-              borderRadius: 10,
-            }
-          : { backgroundColor: colors.bg2 },
-      ]}
-    >
+    <View style={[styles.card, { backgroundColor: colors.bg2 }]}>
       <Text style={[styles.label, { color }]}>{label}</Text>
       <Text style={[styles.value, { color: colors.t1 }]}>{value}</Text>
     </View>
@@ -38,18 +26,18 @@ export function SummaryCard({ label, value, color, variant = 'filled' }: Props) 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: radius.card,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
   },
   label: {
     fontSize: 11,
     fontWeight: '500',
   },
   value: {
-    fontSize: 16,
-    fontWeight: '300',
-    marginTop: 2,
+    fontSize: 17,
+    fontWeight: '500',
+    marginTop: 3,
   },
 });
 

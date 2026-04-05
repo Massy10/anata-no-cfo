@@ -56,20 +56,6 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: colors.bg }]}>
       <View style={[styles.flex, styles.container]}>
-        {/* Decorative bubbles */}
-        <View
-          style={[styles.bubble, {
-            width: 100, height: 100, borderRadius: 50,
-            backgroundColor: `${colors.blue}0F`, top: 60, right: -30,
-          }]}
-        />
-        <View
-          style={[styles.bubble, {
-            width: 80, height: 80, borderRadius: 40,
-            backgroundColor: `${colors.purple}0D`, bottom: 120, left: -20,
-          }]}
-        />
-
         {/* Center content */}
         <View style={styles.centerContent}>
           {/* App icon */}
@@ -167,8 +153,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { position: 'relative', overflow: 'hidden' },
-  bubble: { position: 'absolute' },
+  container: {},
   centerContent: {
     flex: 1,
     justifyContent: 'center',

@@ -1,66 +1,31 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/useTheme';
-import { radius } from '@/theme/tokens';
-
-let BlurView: React.ComponentType<any> | null = null;
-try {
-  BlurView = require('expo-blur').BlurView;
-} catch {
-  BlurView = null;
-}
 
 type Props = {
   children: React.ReactNode;
   variant?: 'positive' | 'negative';
 };
 
+/**
+ * 画面の主役数値を表示するカード。
+ * 装飾は排除。variant で背景のトーンだけ変える。
+ */
 export function HeroCard({ children, variant = 'positive' }: Props) {
-  const { colors, isDark } = useTheme();
-  const accentColor = variant === 'positive' ? colors.green : colors.red;
-
-  const inner = (
-    <>
-      <View
-        style={[
-          styles.decorCircleTopRight,
-          { backgroundColor: accentColor, opacity: 0.12 },
-        ]}
-      />
-      <View
-        style={[
-          styles.decorCircleBottomLeft,
-          { backgroundColor: accentColor, opacity: 0.08 },
-        ]}
-      />
-      {children}
-    </>
-  );
-
-  const containerStyle = [
-    styles.container,
-    {
-      borderColor: colors.heroBorder as string,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.2 : 0.04,
-      shadowRadius: 10,
-      elevation: 2,
-    },
-  ];
-
-  if (BlurView && Platform.OS === 'ios') {
-    return (
-      <View style={containerStyle}>
-        <BlurView intensity={12} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
-        <View style={styles.contentWrap}>{inner}</View>
-      </View>
-    );
-  }
+  const { colors } = useTheme();
+  const accent = variant === 'positive' ? colors.green : colors.red;
 
   return (
-    <View style={[containerStyle, { backgroundColor: colors.heroGlass as string }]}>
-      {inner}
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: accent + '08',
+          borderColor: accent + '15',
+        },
+      ]}
+    >
+      {children}
     </View>
   );
 }
@@ -69,38 +34,11 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
     marginBottom: 8,
-    padding: 20,
-    paddingHorizontal: 16,
-    borderRadius: radius.hero,
-    borderWidth: 0.5,
-    overflow: 'hidden',
-    position: 'relative',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    borderWidth: 1,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 20,
-    elevation: 2,
-  },
-  contentWrap: {
-    padding: 20,
-    paddingHorizontal: 16,
-  },
-  decorCircleTopRight: {
-    position: 'absolute',
-    top: -20,
-    right: -20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  decorCircleBottomLeft: {
-    position: 'absolute',
-    bottom: -15,
-    left: -15,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
   },
 });
 
