@@ -6,6 +6,7 @@ export default function IncomeLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="edit/[id]" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

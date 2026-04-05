@@ -34,9 +34,9 @@ export const creditCardsData = [
 ];
 
 export const scheduledExpensesData = [
-  { id: '1', name: '結婚式（友人）', amount: 300000, scheduled_date: '2026年8月10日', days: 128, icon: '💒', memo: 'ご祝儀＋交通費' },
-  { id: '2', name: '車検', amount: 120000, scheduled_date: '2026年11月', days: 210, icon: '🚗', memo: 'ディーラー見積もり' },
-  { id: '3', name: '引越し費用', amount: 350000, scheduled_date: '2027年3月', days: 335, icon: '📦', memo: '敷金・礼金・仲介料' },
+  { id: '1', name: '結婚式（友人）', amount: 300000, scheduled_date: '2026年8月10日', days: 128, icon: '💒', memo: 'ご祝儀＋交通費', type: 'variable' as const },
+  { id: '2', name: '車検', amount: 120000, scheduled_date: '2026年11月', days: 210, icon: '🚗', memo: 'ディーラー見積もり', type: 'variable' as const },
+  { id: '3', name: '引越し費用', amount: 350000, scheduled_date: '2027年3月', days: 335, icon: '📦', memo: '敷金・礼金・仲介料', type: 'variable' as const },
 ];
 
 export const loansData = [

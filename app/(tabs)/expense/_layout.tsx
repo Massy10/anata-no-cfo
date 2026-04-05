@@ -6,8 +6,11 @@ export default function ExpenseLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="edit/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="sub/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="loan/[id]" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="card/new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="card/[id]" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

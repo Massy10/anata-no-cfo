@@ -124,15 +124,16 @@ export default function ExpenseDetailScreen() {
         {/* Actions */}
         <SectionCard header="アクション">
           {[
-            ['複製', colors.blue],
+            ['編集', colors.blue],
+            ['複製', colors.green],
             ['削除', colors.red],
           ].map(([label, color], i) => (
             <TableRow
               key={i}
               title={label}
               rightColor={color}
-              last={i === 1}
-              onPress={() => {}}
+              last={i === 2}
+              onPress={label === '編集' ? () => router.push(`/expense/edit/${item.id}`) : () => {}}
             />
           ))}
         </SectionCard>

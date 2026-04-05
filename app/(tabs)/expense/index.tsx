@@ -87,6 +87,8 @@ export default function ExpenseTabScreen() {
     return expenseData.filter((e) => e.type === 'variable');
   }, [expenseFilter]);
 
+  const showScheduledInVariable = expenseFilter === '変動費';
+
   const renderList = () => (
     <>
       {/* Filter pills */}
@@ -153,6 +155,30 @@ export default function ExpenseTabScreen() {
           );
         })}
       </SectionCard>
+
+      {showScheduledInVariable && scheduledExpensesData.length > 0 && (
+        <SectionCard header="予定一時金">
+          {scheduledExpensesData.map((item, idx) => {
+            const months = Math.round((item.days ?? 0) / 30);
+            const badgeText = months <= 1 ? '今月中' : months < 12 ? `${months}ヶ月後` : `${Math.round(months / 12)}年後`;
+            const badgeColor = months < 5 ? colors.orange : colors.cyan;
+            return (
+              <TableRow
+                key={item.id}
+                icon={item.icon}
+                iconBg={colors.orange + '22'}
+                title={item.name}
+                subtitle={`${item.scheduled_date} · ${item.memo}`}
+                badge={badgeText}
+                badgeColor={badgeColor}
+                right={`¥${item.amount.toLocaleString()}`}
+                rightColor={colors.orange}
+                last={idx === scheduledExpensesData.length - 1}
+              />
+            );
+          })}
+        </SectionCard>
+      )}
     </>
   );
 
@@ -230,6 +256,14 @@ export default function ExpenseTabScreen() {
 
   const renderCards = () => (
     <>
+      {/* Add card button */}
+      <TouchableOpacity
+        style={[styles.addCardBtn, { backgroundColor: colors.bg2, borderColor: colors.sep }]}
+        onPress={() => router.push('/expense/card/new')}
+        activeOpacity={0.7}
+      >
+        <Text style={[styles.addCardText, { color: colors.blue }]}>＋ カードを追加</Text>
+      </TouchableOpacity>
       {creditCardsData.map((card) => {
         const usage = card.balance / card.credit_limit;
         const usagePct = (usage * 100).toFixed(0);
@@ -237,7 +271,9 @@ export default function ExpenseTabScreen() {
 
         return (
           <View key={card.id} style={styles.cardContainer}>
-            <CreditCardVisual card={card} />
+            <TouchableOpacity activeOpacity={0.85} onPress={() => router.push(`/expense/card/${card.id}`)}>
+              <CreditCardVisual card={card} />
+            </TouchableOpacity>
             {/* Usage bar */}
             <View style={styles.usageBarOuter}>
               <View style={[styles.usageTextRow, { marginBottom: 4 }]}>
@@ -512,6 +548,19 @@ const styles = StyleSheet.create({
   },
   usageLimit: {
     fontSize: 13,
+  },
+  addCardBtn: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  addCardText: {
+    fontSize: 15,
+    fontWeight: '500',
   },
   // Scheduled
   schedHero: {

@@ -126,15 +126,16 @@ export default function IncomeDetailScreen() {
         {/* Actions */}
         <SectionCard header="アクション" footer="オブジェクトを選択してからアクションを実行">
           {[
-            ['複製', colors.blue],
+            ['編集', colors.blue],
+            ['複製', colors.green],
             ['削除', colors.red],
           ].map(([label, color], i) => (
             <TableRow
               key={i}
               title={label as string}
               rightColor={color as string}
-              last={i === 1}
-              onPress={() => {}}
+              last={i === 2}
+              onPress={label === '編集' ? () => router.push(`/income/edit/${item.id}`) : () => {}}
             />
           ))}
         </SectionCard>
