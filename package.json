@@ -1,0 +1,45 @@
+{
+  "name": "anata-no-cfo",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "lint": "expo lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "expo": "~52.0.0",
+    "expo-apple-authentication": "~7.1.0",
+    "expo-auth-session": "~6.0.0",
+    "expo-blur": "~14.0.0",
+    "expo-camera": "~16.0.0",
+    "expo-crypto": "~14.0.0",
+    "expo-haptics": "~14.0.0",
+    "expo-image-picker": "~16.0.0",
+    "expo-router": "~4.0.0",
+    "expo-secure-store": "~14.0.0",
+    "expo-status-bar": "~2.0.0",
+    "i18next": "^23.15.0",
+    "react": "18.3.1",
+    "react-i18next": "^15.0.0",
+    "react-native": "0.76.3",
+    "react-native-gesture-handler": "~2.20.0",
+    "react-native-google-mobile-ads": "^14.5.0",
+    "react-native-purchases": "^8.2.0",
+    "react-native-reanimated": "~3.16.0",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.1.0",
+    "react-native-svg": "^15.8.0",
+    "victory-native": "^41.4.0",
+    "@react-native-async-storage/async-storage": "1.23.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.0",
+    "@types/react": "~18.3.0",
+    "typescript": "^5.3.0"
+  },
+  "private": true
+}

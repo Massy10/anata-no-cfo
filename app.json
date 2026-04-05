@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "あなたのCFO",
+    "slug": "anata-no-cfo",
+    "version": "1.0.0",
+    "scheme": "anata-no-cfo",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.antigravity.anatano-cfo",
+      "usesAppleSignIn": true
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "レシートの読み取りにカメラを使用します。"
+        }
+      ],
+      "expo-apple-authentication",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
